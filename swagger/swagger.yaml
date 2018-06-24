@@ -1,0 +1,46 @@
+swagger: '2.0'
+info:
+  description: ''
+  version: 1.0.0
+  title: D4D Project API Server Swagger
+  termsOfService: ''
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: '127.0.0.1:4400'
+basePath: /api/v1
+tags:
+  - name: User
+    description: 사용자
+schemes:
+  - http
+paths:
+  /user/login:
+    post:
+      tags:
+        - User
+      summary : 로그인
+      description : 로그인
+      parameters :
+        - in : body
+          name : body
+          description : 사용자 정보
+          required : true    
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: string
+                description: 사용자 고유 id
+      responses:
+        '200':
+          description : 로그인 정보
+          schema:
+            type : object
+            properties :
+              user_id:
+                type: string
+                description: 사용자 고유 id
+        '400':
+          description: 로그인 실패

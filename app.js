@@ -1,23 +1,51 @@
-// 모듈 삽입 부분
-const express = require('express');
-const http = require('http');
+'use strict'
 
-// 익스프레스 객체 생성 및 속성 설정
-const app = express();
+require('dotenv').config({path:'./d4d_api_server.env'})
+const express = require('express')
+const http = require('http')
+const path = require('path')
+const app = express()
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
 
-// Express 모듈 포트 설정
-app.set('port', process.env.PORT || 8080);
+// Mongoose Query Paginate
+require('mongoose-query-paginate')
 
-// 예시 API, 서버 정상 작동의 여부와, 서버 시간을 반환한다.
-app.get('/on', (req, res) => {
-    res.send({server_on:true});
-});
-app.get('/time', (req,res) =>{
-    let time = new Date();
-    res.send({server_time:time.toLocaleString()});
-});
+// MongoDB Connectiong
+mongoose.Promise = global.Promise
+mongoose.connect(process.env.MONGO_URI_DEV)
+var db = mongoose.connection
+db.once('open', function () {
+   console.log('MongoDB connected!')
+})
+db.on('error', function (err) {
+  console.log('MongoDB ERROR:', err)
+})
 
-//서버 실행
-http.createServer(app).listen(app.get('port'), () => {
-    console.log(app.get('port') + '번 포트에서 API 서버를 시작했습니다.');
-});
+// Http Middlewares
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH')
+  res.header('Access-Control-Allow-Headers', 'content-type')
+  next()
+})
+
+// API Routing
+app.use('/api/v1', require('./api/index'))
+
+// Swagger
+const swaggerUi = require('swagger-ui-express')
+const YAML = require('yamljs')
+const swaggerDocument = YAML.load('./swagger/swagger.yaml')
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Server
+const port = process.env.PORT
+app.listen(port, () => {
+  console.log(`listening on port: ${port}`)
+})
+
+module.exports = app
