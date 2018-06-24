@@ -11,6 +11,8 @@ exports.socialLogin = (req, res) => {
   const userId = req.body.user_id
   const snsType = req.body.sns_type
 
+  console.log('login api !!!')
+
   // TEST
   User
   .create({
