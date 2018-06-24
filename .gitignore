@@ -1,2 +1,4 @@
 node_modules/
 .idea/
+.vscode
+d4d_api_server.env
