@@ -1,0 +1,8 @@
+{
+  "apps" : [{
+    "name"        : "d4d-api",
+    "script"      : "./app.js",
+    "watch"       : false,
+    "node_args": "-r dotenv/config app.js dotenv_config_path=./d4d_api_server.env"
+  }]
+}
