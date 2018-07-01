@@ -10,11 +10,11 @@ const Project = new Schema({
     designer: [String], // 디자인
     developer: [String] // 개발자
   },
-  attachments: { // 첨부파일
+  attachments: [{ // 첨부파일 목록
     fileName: String, // 파일명
-    s3Path: String, // AWS S3 경로
-    sise: Number // 파일 사이즈
-  },
+    s3Location: String, // AWS S3 경로
+    size: Number // 파일 사이즈
+  }],
   created_dt: {type: Date, default: Date.now}, // 생성 일시
   updated_dt: {type: Date, default: Date.now}, // 수정 일시
 },
