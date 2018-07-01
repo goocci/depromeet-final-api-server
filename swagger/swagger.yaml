@@ -8,7 +8,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-host: '127.0.0.1:4400'
+host: '13.125.196.191:4400'
 basePath: /api/v1
 tags:
   - name: User
