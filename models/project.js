@@ -25,6 +25,11 @@ const Project = new Schema({
   }],
   createdDt: {type: Date, default: Date.now}, // 생성 일시
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
+  comments: [{
+    commenterId: String, // User 아이디
+    contents: String, // 내용
+    date: {type: Date, default: Date.now} // 일자
+  }]
 },
 {collection: 'project'}
 )
