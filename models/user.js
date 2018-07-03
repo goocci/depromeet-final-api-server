@@ -11,12 +11,12 @@ const User = new Schema({
   profileImage: { // 프로필 이미지
     original: { // 원본 이미지
       fileName: String, // 파일명
-      s3Path: String, // AWS S3 경로
+      s3Location: String, // AWS S3 경로
       size: Number // 파일 사이즈
     },
     resized: { // 리사이즈된 이미지
       fileName: String, // 파일명
-      s3Path: String, // AWS S3 경로
+      s3Location: String, // AWS S3 경로
       size: Number // 파일 사이즈
     }
   },
