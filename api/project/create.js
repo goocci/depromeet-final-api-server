@@ -10,6 +10,8 @@ const Project = require("../../models/project")
 exports.createProject = (req, res) => {
   const userId = req.body.userId
   const title = req.body.title
+  const startDt = req.body.startDate // [TODO] utc?
+  const endDt = req.body.endDate // [TODO] utc?
   const text = req.body.text
   const skillCodeDesigner = req.body.skillCodeDesigner
   const skillCodeDeveloper = req.body.skillCodeDeveloper
@@ -48,11 +50,14 @@ exports.createProject = (req, res) => {
             userId: userId,
             title: title,
             text: text,
+            startDt: startDt,
+            endDt: endDt,
             skillCode: {
               designer: JSON.parse(skillCodeDesigner),
               developer: JSON.parse(skillCodeDeveloper)
             },
-            attachments: attachmentsArr
+            attachments: attachmentsArr,
+            applicant: []
           })
   }
 

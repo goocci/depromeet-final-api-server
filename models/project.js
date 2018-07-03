@@ -18,7 +18,7 @@ const Project = new Schema({
     s3Location: String, // AWS S3 경로
     size: Number // 파일 사이즈
   }],
-  hits: Number, // 조회수
+  hits: {type: Number, default: 0}, // 조회수
   applicant: [{ // 지원자 목록
     userId: String, // 지원자 고유 id
     join: Boolean, // 참여 여부
