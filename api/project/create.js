@@ -1,6 +1,8 @@
 'use strict'
 
-const Project = require("../../models/project")
+const Project = require('../../models/project')
+const User = require('../../models/user')
+const utils = require('../../utils')
 
 /**
  * 프로젝트 생성
@@ -15,6 +17,11 @@ exports.createProject = (req, res) => {
   const text = req.body.text
   const skillCodeDesigner = req.body.skillCodeDesigner
   const skillCodeDeveloper = req.body.skillCodeDeveloper
+
+  let projectInfo
+  let userInfo
+  let designerSkillArr = []
+  let developerSkillArr = []
 
   // 0. 요청 바디 확인
   const checkReqBody = () => {
@@ -61,15 +68,69 @@ exports.createProject = (req, res) => {
           })
   }
 
-  // 3. 응답
-  const resp = (results) => {
-    // [TODO] 프로젝트 상세화면에 필요한 데이터 응답 (=프로젝트 상세조회 API 응답 데이터)
-    res.status(200).json(results)
+  // 3. 작성자 정보 조회
+  const getWriterInfo = (result) => {
+    projectInfo = result
+    return User.findOne({ userId: userId })
+  }
+
+  // 4. 기술코드 파싱
+  const parseProjectSkillCode = (result) => {
+    return new Promise((resolve, reject) => {
+      userInfo = result
+      async function parseCode() {
+        designerSkillArr = await utils.parseSkillCode.getSkillCodeName('designer', projectInfo.skillCode.designer)
+        developerSkillArr = await utils.parseSkillCode.getSkillCodeName('developer', projectInfo.skillCode.developer)
+  
+        resolve()
+      }
+  
+      parseCode()
+    })
+  }
+
+  // 5. 응답
+  const resp = () => {
+    let profileImage = 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png'
+    if (userInfo.profileImage) profileImage = userInfo.profileImage.resized.s3Location
+
+    let attachments = projectInfo.attachments.map((att) => {
+      return {
+        fileName: att.fileName,
+        downloadUrl: att.s3Location
+      }
+    })
+
+    let response = {
+      projectInfo: {
+        projectId: projectInfo._id,
+        skill: {
+          designer: designerSkillArr,
+          developer: developerSkillArr
+        },
+        hits: projectInfo.hits,
+        title: projectInfo.title,
+        text: projectInfo.text,
+        startDate: startDt,
+        endDate: endDt,
+        attachments: attachments
+      },
+      writerInfo: {
+        userId: userInfo.userId,
+        nickName: userInfo.nickName,
+        profileImage: profileImage
+      },
+      isWriter: true // 프로젝트 생성자가 무조건 작성자
+    }
+
+    res.status(200).json(response)
   }
 
   checkReqBody()
   .then(checkAttachments)
   .then(createNewProject)
+  .then(getWriterInfo)
+  .then(parseProjectSkillCode)
   .then(resp)
   .catch((err) => {
     console.error(err)
