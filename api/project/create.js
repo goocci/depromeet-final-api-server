@@ -91,9 +91,6 @@ exports.createProject = (req, res) => {
 
   // 5. 응답
   const resp = () => {
-    let profileImage = 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png'
-    if (userInfo.profileImage) profileImage = userInfo.profileImage.resized.s3Location
-
     let attachments = projectInfo.attachments.map((att) => {
       return {
         fileName: att.fileName,
@@ -118,7 +115,7 @@ exports.createProject = (req, res) => {
       writerInfo: {
         userId: userInfo.userId,
         nickName: userInfo.nickName,
-        profileImage: profileImage
+        profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
       },
       isWriter: true // 프로젝트 생성자가 무조건 작성자
     }
