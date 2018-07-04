@@ -5,11 +5,12 @@ const Project = require("../../models/project")
 exports.lookupAllProject = (req, res) => {
     //0. Page 수 확인
     const pageNum = req.query.page || req.body.page
+    const returnNum = req.query.num || req.body.num // 반환하는 프로젝트 수
 
     //1. QueryString 체크
     const checkQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!pageNum) {
+            if (!pageNum || !returnNum) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -21,7 +22,7 @@ exports.lookupAllProject = (req, res) => {
 
     // 2. 응답, Page 수에 맞는 최신 글 12개 리턴
     const resp = () => {
-        let list = Project.find().sort({_id : -1}).skip((pageNum-1)*12).limit(12).populate('pm_id')
+        let list = Project.find().sort({_id : -1}).skip((pageNum-1)*returnNum).limit(returnNum).populate('pm_id')
         list.exec((err, posts) => {
             if (err) throw err
             res.status(200).json(posts)
