@@ -2,31 +2,32 @@
 
 const Project = require("../../models/project")
 
+// Promise 할 것
 exports.AddComment = (req, res) => {
     const pId = req.body.pId // 프로젝트 ID
     const uId = req.body.uId // User ID
     const contents = req.body.contents // 내용
 
     const addComment = (pId, uId, Contents) => {
-        Project.findById(pId,(err, proj) => {
+        Project.findOne({_id : pId}).exec((err, proj) => {
             if (err)
                 throw err
-            proj.comment.push({
-                commenterId : uId,
-                contents : Contents,
-                date : Date.now()
+            console.log(proj)
+            proj.comments.push({
+                commenterId: uId,
+                contents: Contents,
             })
             proj.save((err) => {
-                if(err) throw err
+                if (err) throw err
             })
         })
     }
     addComment(pId, uId, contents, (err) => {
         if (err){
-            req.send({error : 1})
+            res.send({error : 1})
         }
         else {
-            req.send({error : 0})
+            res.send({error : 0})
         }
     })
 }
