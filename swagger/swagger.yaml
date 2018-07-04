@@ -137,6 +137,16 @@ paths:
           description: 내용
           required: true
           type: string
+        - name: startDate
+          in: formData
+          description: 프로젝트 시작일시
+          required: true
+          type: string
+        - name: endDate
+          in: formData
+          description: 프로젝트 종료일시
+          required: true
+          type: string
         - name: skillCodeDesigner
           in: formData
           description: 기술코드목록 (디자이너) (Ex. "['DESIGNER_SKILL_CODE_1','DESIGNER_SKILL_CODE_3']")
