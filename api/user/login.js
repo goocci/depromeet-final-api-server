@@ -40,16 +40,13 @@ exports.socialLogin = (req, res) => {
 
   // 3. 사용자 정보 응답
   const respUserInfo = (userInfo) => {
-    let profileImage = 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png'
-    if (userInfo.profileImage) profileImage = userInfo.profileImage.resized.s3Location
-
     res.status(200).json({
       userId: userInfo.userId,
       email: userInfo.email,
       nickName: userInfo.nickName,
       realName: userInfo.realName,
       snsType: userInfo.snsType,
-      profileImage: profileImage
+      profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
     })
   }
 
