@@ -5,5 +5,7 @@ const router = express.Router()
 const login = require('./login')
 
 router.post('/login', login.socialLogin) // 소셜로그인 (회원가입)
+router.post('/profileWrite', profile.firstwrite)
+router.post('/profileModify', profile.modify)
 
 module.exports = router

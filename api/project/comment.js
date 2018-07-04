@@ -2,8 +2,7 @@
 
 const Project = require("../../models/project")
 
-//실험을 아직 안함
-exports.WriteComment = (req, res) => {
+exports.AddComment = (req, res) => {
     const pId = req.body.pId // 프로젝트 ID
     const uId = req.body.uId // User ID
     const contents = req.body.contents // 내용
@@ -30,4 +29,7 @@ exports.WriteComment = (req, res) => {
             req.send({error : 0})
         }
     })
+}
+exports.DeleteComment = (req, res) =>{
+
 }
