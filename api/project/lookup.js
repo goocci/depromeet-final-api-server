@@ -35,7 +35,6 @@ exports.lookupAllProject = (req, res) => {
         })
 }
 
-// 아직 에러가 있다
 exports.lookupDetail = (req, res) => {
     //0. Project id 입력받음
     const pId = req.query.id || req.body.id
@@ -54,7 +53,7 @@ exports.lookupDetail = (req, res) => {
 
     //1. Project 존재 유무 판별
     const ProjectInfo = () => {
-        Project.find({_id: pId}).limit(1).exec((err, proj) => {
+        Project.findOne({_id: pId}).exec((err, proj) => {
             if (err) throw err
 
             if (!proj){
@@ -66,7 +65,6 @@ exports.lookupDetail = (req, res) => {
         })
 
     }
-
     checkQueryString().
         then(ProjectInfo).
         catch((err)=>{
