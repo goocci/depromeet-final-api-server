@@ -22,6 +22,7 @@ const Project = new Schema({
   applicant: [{ // 지원자 목록
     userId: String, // 지원자 고유 id
     join: Boolean, // 참여 여부
+    contents: String // 지원 메세지
   }],
   createdDt: {type: Date, default: Date.now}, // 생성 일시
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
