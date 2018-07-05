@@ -4,6 +4,23 @@ const Project = require("../../models/project")
 const User = require("../../models/user")
 
 //Coding 중
+exports.Comments = (req, res) => {
+    const projId = req.body.pId || req.query.pId
+
+    //1. QueryString 체크
+    const CheckQueryString = () => {
+        return new Promise((resolve, reject) => {
+            if (!projId) {
+                return reject({
+                    code: 'query_string_error',
+                    message: 'query string is not defined'
+                })
+            } else resolve()
+        })
+    }
+
+    //2.
+}
 exports.AddComment = (req, res) => {
     const projId = req.body.pId || req.query.pId // 프로젝트 ID
     const userId = req.body.uId || req.query.uId // User ID
@@ -108,7 +125,6 @@ exports.DeleteComment = (req, res) =>{
                     })
                 }
                 else{
-                    console.log(project)
                     resolve(project)
                 }
             })
@@ -118,7 +134,7 @@ exports.DeleteComment = (req, res) =>{
     //3. 댓글 존재하는 지, 유저 일치하는지 체크
     const CheckExistUser = (Proj) => {
         return new Promise((resolve, reject) => {
-            let index = Proj.comments.map(x => x._id).indexOf(commentId)
+            let index = Proj.comments.findIndex(x => x._id == commentId)
 
             if (index == -1){
                 return reject({
