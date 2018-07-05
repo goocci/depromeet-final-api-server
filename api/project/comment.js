@@ -19,7 +19,30 @@ exports.Comments = (req, res) => {
         })
     }
 
-    //2.
+    //2. Project 있는지 확인한 후에
+    const CheckProjectAndReturn = () =>{
+        return new Promise((resolve, reject) => {
+            Project.findOne({_id: projId}).exec((err, proj)=>{
+                if (err) throw err
+                if (!proj) {
+                    return reject({
+                        code: 'project_doesn\'t_exist',
+                        message: 'project doesn\'t exist'
+                    })
+                }
+                else {
+                    res.status(200).json(proj.comments)
+                }
+            })
+        })
+    }
+
+    CheckQueryString()
+        .then(CheckProjectAndReturn)
+        .catch((err) => {
+            if (err)
+                res.status(500).send(err)
+        })
 }
 exports.AddComment = (req, res) => {
     const projId = req.body.pId || req.query.pId // 프로젝트 ID
@@ -51,7 +74,6 @@ exports.AddComment = (req, res) => {
                     })
                 }
                 else{
-                    console.log(project)
                     resolve(project)
                 }
             })

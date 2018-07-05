@@ -22,15 +22,52 @@ exports.apply = (req, res) => {
     //2. 신청 여부 확인
     const CheckApplied = () => {
         return new Promise((resolve, reject) => {
-            let index = Project.applicant.findIndex(x => x._id == commentId)
-            if (index == -1){
-
-            }
-            else {
-
-            }
+            User.findone({_id: userId}).exec((err, user) => {
+                if (err) throw err
+                if (!user) {
+                    return reject({
+                        code: 'user_doesn\'t_exist',
+                        message: 'user doesn\'t exist'
+                    })
+                }
+            })
+            Project.findOne({_id: projectId}).exec((err, proj) => {
+                if (err) throw err
+                if (!proj) {
+                    return reject({
+                        code: 'project_doesn\'t_exist',
+                        message: 'project doesn\'t exist'
+                    })
+                }
+                else {
+                    let index = proj.applicant.findIndex(x => x._id == userId)
+                    if (index == -1){
+                        proj.applicant.push({
+                            userId: userId,
+                            join: false
+                        })
+                        proj.save((err) => {
+                            if (err)
+                                throw err
+                        })
+                        res.status(200).json({
+                            applySuccess: true
+                        })
+                    } else {
+                        res.status(200).json({
+                            applySuccess: false
+                        })
+                    }
+                }
+            })
         })
     }
+    CheckQueryString()
+        .then(CheckApplied)
+        .catch((err)=>{
+            if (err)
+                res.status.json(err)
+        })
 }
 exports.applyCancel = (req, res) => {
 
