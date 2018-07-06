@@ -22,6 +22,7 @@ const User = new Schema({
   },
   createdDt: {type: Date, default: Date.now}, // 생성 일시
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
+  introduction: String // 자기 소개
 },
 {collection: 'user'}
 )
