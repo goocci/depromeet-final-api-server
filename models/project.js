@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const Project = new Schema({
-  userId: String, // 사용자 고유 id(=작성자)
+  writerId: String, // 사용자 고유 id(=작성자)
   title: String, // 제목
   text: String, // 본문
   startDt: Date, // 프로젝트 시작일시
