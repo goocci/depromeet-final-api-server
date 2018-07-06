@@ -5,6 +5,7 @@ const Schema = mongoose.Schema
 
 const User = new Schema({
   userId: String, // 사용자 고유 id
+  email: String, // 이메일
   snsType: String, // 소셜로그인 종류
   realName: {type: String, default: ''}, // 실명
   nickName: String, // 닉네임
@@ -22,7 +23,11 @@ const User = new Schema({
   },
   createdDt: {type: Date, default: Date.now}, // 생성 일시
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
-  introduction: String // 자기 소개
+  introduction: String, // 자기 소개
+  skillCode: { // 보유 기술코드 목록
+    designer: [String], // 디자이너 기술코드 목록
+    developer: [String] // 개발자 기술코드 목록
+  }
 },
 {collection: 'user'}
 )

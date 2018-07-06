@@ -44,9 +44,10 @@ exports.socialLogin = (req, res) => {
       userId: userInfo.userId,
       email: userInfo.email,
       nickName: userInfo.nickName,
-      realName: userInfo.realName,
+      realName: userInfo.realName || '',
       snsType: userInfo.snsType,
       profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+      introduction: userInfo.introduction || ''
     })
   }
 
