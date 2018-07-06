@@ -41,7 +41,7 @@ exports.apply = (req, res) => {
                     })
                 }
                 else {
-                    let index = proj.applicant.findIndex(x => x._id == userId)
+                    let index = proj.applicant.findIndex(x => x.userId == userId)
                     if (index == -1){
                         proj.applicant.push({
                             userId: userId,
@@ -53,11 +53,11 @@ exports.apply = (req, res) => {
                                 throw err
                         })
                         res.status(200).json({
-                            applySuccess: true
+                            applySuccess: true // 지원 성공 시
                         })
                     } else {
                         res.status(200).json({
-                            applySuccess: false
+                            applySuccess: false // 중복 시
                         })
                     }
                 }
@@ -68,18 +68,17 @@ exports.apply = (req, res) => {
         .then(CheckApplied)
         .catch((err)=>{
             if (err)
-                res.status.json(err)
+                res.status(500).json(err)
         })
 }
 exports.applyCancel = (req, res) => {
     const projectId = req.body.pId || req.query.pId
     const userId = req.body.uId || req.query.uId
-    const contents = req.body.contents || req.query.contents
 
     //1. QueryString 체크
     const CheckQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!projectId || !userId || !contents) {
+            if (!projectId || !userId) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -91,7 +90,7 @@ exports.applyCancel = (req, res) => {
     //2. 신청 여부 확인
     const CheckApplied = () => {
         return new Promise((resolve, reject) => {
-            User.findOne({_id: userId}).exec((err, user) => {
+            User.findOne({_id: userId}).exec((err, user) => { // 유저 존재 확인
                 if (err) throw err
                 if (!user) {
                     return reject({
@@ -109,7 +108,7 @@ exports.applyCancel = (req, res) => {
                     })
                 }
                 else {
-                    let index = proj.applicant.findIndex(x => x._id == userId)
+                    let index = proj.applicant.findIndex(x => x.userId == userId)
                     if (index != -1){
                         proj.applicant.splice(index,1)
                         proj.save((err) => {
@@ -138,12 +137,11 @@ exports.applyCancel = (req, res) => {
 exports.applyList = (req, res) => {
     const projectId = req.body.pId || req.query.pId
     const PMId = req.body.PMId || req.query.PMId
-    const contents = req.body.contents || req.query.contents
 
     //1. QueryString 체크
     const CheckQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!projectId || !PMId || !contents) {
+            if (!projectId || !PMId) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -164,7 +162,7 @@ exports.applyList = (req, res) => {
                     })
                 }
                 else {
-                    if (proj.userId == PMId){
+                    if (proj.writerId == PMId){
                         res.status(200).json(proj.applicant)
                     }
                     else {
@@ -215,11 +213,11 @@ exports.applyToggle = (req, res) => {
                     })
                 }
                 else {
-                    if (proj.userId == PMId){
+                    if (proj.writerId == PMId){
                         resolve(proj)
                     }
                     else {
-                        return reject({
+                        return reject({ // PMID와 프로젝트의 PmId가 안겹칠때
                             code: 'not_match',
                             message: 'This Id does not match'
                         })
@@ -232,7 +230,7 @@ exports.applyToggle = (req, res) => {
     //3. User ID 존재 여부, 있으면 토글
     const CheckUserID = (proj) => {
         return new Promise((resolve, reject) => {
-            let index = proj.applicant.findIndex(x => x._id)
+            let index = proj.applicant.findIndex(x => x.userId)
 
             if (index == -1){
                 return reject({
@@ -245,7 +243,7 @@ exports.applyToggle = (req, res) => {
                     proj.save((err)=>{
                         if (err) throw err
                         else
-                            res.status(200).json({join : false})
+                            res.status(200).json({join : false}) // true to false,
                     })
                 }
                 else {
@@ -253,7 +251,7 @@ exports.applyToggle = (req, res) => {
                     proj.save((err)=>{
                         if (err) throw err
                         else
-                            res.status(200).json({join : true})
+                            res.status(200).json({join : true}) // false to true
                     })
                 }
             }

@@ -3,7 +3,6 @@
 const Project = require("../../models/project")
 const User = require("../../models/user")
 
-//Coding 중
 exports.Comments = (req, res) => {
     const projId = req.body.pId || req.query.pId
 
@@ -120,7 +119,7 @@ exports.AddComment = (req, res) => {
 exports.DeleteComment = (req, res) =>{
     const projId = req.body.pId || req.query.pId // 프로젝트 ID
     const commentId = req.body.cId || req.query.cId // Comment ID
-    const userId = req.body.uId || req.query.uId // User ID
+    const userId = req.body.uId || req.query.uId // User ID 혹은 PM ID
 
     //1. QueryString 체크
     const CheckQueryString = () => {
@@ -169,7 +168,14 @@ exports.DeleteComment = (req, res) =>{
                 Proj.comments.splice(index, 1)
                 Proj.save((err, object) =>{
                     if (err) throw err
-                    res.status(200).send({success : 1})
+                    res.status(200).send({success : true, removedByPM : false})
+                })
+            }
+            else if (Proj.writerId == userId){
+                Proj.comments.splice(index, 1)
+                Proj.save((err, object) =>{
+                    if (err) throw err
+                    res.status(200).send({success : true, removedByPM : true})
                 })
             }
             else {
