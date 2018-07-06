@@ -186,7 +186,7 @@ exports.applyList = (req, res) => {
             }
         })
 }
-exports.ApplyToggle = (req, res) => {
+exports.applyToggle = (req, res) => {
     const projectId = req.body.pId || req.query.pId
     const PMId = req.body.PMId || req.query.PMId
     const userId = req.body.uId || req.query.uId
