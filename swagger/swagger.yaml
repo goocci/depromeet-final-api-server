@@ -231,7 +231,7 @@ paths:
                 type: object
                 description: 작성자(PM) 정보
                 properties:
-                  userId:
+                  writerId:
                     type: string
                     description: 사용자 고유 id
                   nickName:

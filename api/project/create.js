@@ -54,7 +54,7 @@ exports.createProject = (req, res) => {
   const createNewProject = (attachmentsArr) => {
     return Project
           .create({
-            userId: userId,
+            writerId: userId,
             title: title,
             text: text,
             startDt: startDt,
@@ -113,7 +113,7 @@ exports.createProject = (req, res) => {
         attachments: attachments
       },
       writerInfo: {
-        userId: userInfo.userId,
+        writerId: userInfo.userId,
         nickName: userInfo.nickName,
         profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
       },
