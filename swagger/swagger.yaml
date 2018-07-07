@@ -213,10 +213,10 @@ paths:
                     description: 내용
                   startDate:
                     type: string
-                    description: 프로젝트 시작날짜
+                    description: 프로젝트 시작날짜 (YYYY-MM-DD)
                   endDate:
                     type: string
-                    description: 프로젝트 끝날짜
+                    description: 프로젝트 끝날짜 (YYYY-MM-DD)
                   attachments:
                     type: array
                     description: 첨부파일 목록
@@ -280,10 +280,10 @@ paths:
                       description: 내용
                     startDate:
                       type: string
-                      description: 프로젝트 시작날짜
+                      description: 프로젝트 시작날짜 (YYYY-MM-DD)
                     endDate:
                       type: string
-                      description: 프로젝트 끝날짜
+                      description: 프로젝트 끝날짜 (YYYY-MM-DD)
                     hits:
                       type: number
                       description: 조회수

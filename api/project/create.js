@@ -12,8 +12,8 @@ const utils = require('../../utils')
 exports.createProject = (req, res) => {
   const userId = req.body.userId
   const title = req.body.title
-  const startDt = req.body.startDate // [TODO] utc?
-  const endDt = req.body.endDate // [TODO] utc?
+  const startDt = req.body.startDate
+  const endDt = req.body.endDate
   const text = req.body.text
   const skillCodeDesigner = req.body.skillCodeDesigner
   const skillCodeDeveloper = req.body.skillCodeDeveloper
