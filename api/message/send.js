@@ -1,6 +1,5 @@
 'use strict'
 
-const User = require('../../models/user')
 const Message = require('../../models/message')
 
 /**
@@ -11,12 +10,13 @@ const Message = require('../../models/message')
 exports.sendMessage = (req, res) => {
   const senderId = req.body.senderId
   const receiverId = req.body.receiverId
+  const title = req.body.title
   const content = req.body.content
 
   // 0. 요청 바디 확인
   const checkReqBody = () => {
     return new Promise((resolve, reject) => {
-      if (!senderId || !receiverId) {
+      if (!senderId || !receiverId || !title || !content) {
         return reject({
           code: 'request_body_error',
           message: 'request body is not defined'
@@ -31,6 +31,7 @@ exports.sendMessage = (req, res) => {
           .create({
             senderId: senderId,
             receiverId: receiverId,
+            title: title,
             content: content
           })
   }
