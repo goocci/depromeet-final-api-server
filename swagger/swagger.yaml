@@ -17,6 +17,8 @@ tags:
     description: 프로젝트
   - name: Skill-Code
     description: 기술코드
+  - name: Message
+    description: 쪽지
 schemes:
   - http
 paths:
@@ -379,3 +381,40 @@ paths:
                           description: 기술코드명
         '500':
           description: 프로필 정보 조회 실패
+  /message/send:
+    post:
+      tags:
+        - Message
+      summary : 쪽지 보내기
+      description : 쪽지 보내기
+      parameters :
+        - in : body
+          name : body
+          description : 쪽지 정보
+          required : true    
+          schema:
+            type: object
+            properties:
+              senderId:
+                type: string
+                description: 보낸이 고유 id
+              receiverId:
+                type: string
+                description: 받는이 고유 id
+              content:
+                type: string
+                description: 쪽지 내용
+      responses:
+        '200':
+          description : 쪽지 전송 성공
+          schema:
+            type : object
+            properties :
+              code:
+                type: string
+                description: "suc_send_message"
+              message:
+                type: string
+                description: "쪽지 전송 성공"
+        '500':
+          description: 쪽지 전송 실패
