@@ -9,7 +9,7 @@ const moment = require('moment')
  * @param {*} req
  * @param {*} res
  */
-exports.getMyInboxList = (req, res) => {
+exports.getMyReceivedMsgList = (req, res) => {
   const userId = req.query.userId
   const page = req.query.page || 1
   const perPage = req.query.perPage || 10
@@ -67,11 +67,13 @@ exports.getMyInboxList = (req, res) => {
       })
       .then((senderInfo) => {
         resolve({
+          messageId: message._id,
           content: message.content.substring(0, 10),
           title: message.title,
           receiveDate: moment(message.createdDt).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
           isRead: message.isRead,
-          senderNickName: senderInfo.nickName
+          senderNickName: senderInfo.nickName,
+          senderId: senderInfo.userId
         })
       })
       .catch((err) => {
