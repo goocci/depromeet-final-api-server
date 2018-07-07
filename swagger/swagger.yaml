@@ -421,7 +421,7 @@ paths:
                 description: "쪽지 전송 성공"
         '500':
           description: 쪽지 전송 실패
-  /message/list/inbox:
+  /message/list/received:
     get:
       tags:
         - Message
@@ -461,6 +461,9 @@ paths:
                 items:
                   type: object
                   properties:
+                    messageId:
+                      type: string
+                      description: 쪽지 고유 id
                     title:
                       type: string
                       description: 쪽지 제목
@@ -473,8 +476,74 @@ paths:
                     senderNickName:
                       type: string
                       description: 보낸이 닉네임
+                    senderId:
+                      type: string
+                      description: 보낸이 고유 id
                     isRead:
                       type: boolean
                       description: 읽음 여부
         '500':
           description: 나의 받은쪽지함 목록 조회
+  /message/list/sent:
+    get:
+      tags:
+        - Message
+      summary : 나의 보낸쪽지함 목록 조회
+      description : 나의 보낸쪽지함 목록 조회
+      parameters :
+        - in : query
+          name : userId
+          description : 사용자 고유 id
+          required : true
+        - in : query
+          name : page
+          description : 페이지 번호 (default:1)
+          required : false
+        - in : query
+          name : perPage
+          description : 페이지당 아이템 개수 (default:10)
+          required : false
+      responses:
+        '200':
+          description : 쪽지 목록
+          schema:
+            type : object
+            properties :
+              currentPage:
+                type: number
+                description: 현재 페이지 번호
+              lastPage:
+                type: number
+                description: 마지막 페이지 번호
+              totalCount:
+                type: number
+                description: 총 아이템 개수
+              messageList:
+                type: array
+                description: 쪽지 목록
+                items:
+                  type: object
+                  properties:
+                    messageId:
+                      type: string
+                      description: 쪽지 고유 id
+                    title:
+                      type: string
+                      description: 쪽지 제목
+                    content:
+                      type: string
+                      description: 쪽지 내용 (10글자)
+                    sendDate:
+                      type: string
+                      description: 쪽지 받은 날짜
+                    receiverNickName:
+                      type: string
+                      description: 받는이 닉네임
+                    receiverId:
+                      type: string
+                      description: 받는이 고유 id
+                    receiverIsRead:
+                      type: boolean
+                      description: 받는이 여부 여부
+        '500':
+          description: 나의 보낸쪽지함 목록 조회
