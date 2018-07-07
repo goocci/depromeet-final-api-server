@@ -1,11 +1,12 @@
 'use strict'
 
 const Project = require("../../models/project")
+const moment = require("moment")
 
 exports.lookupAllProject = (req, res) => {
     //0. Page 수 확인
-    const pageNum = req.query.page || req.body.page
-    const returnNum = req.query.num || req.body.num // 반환하는 프로젝트 수
+    const pageNum = Number(req.query.page || req.body.page)
+    const returnNum = Number(req.query.num || req.body.num) // 반환하는 프로젝트 수
 
     //1. QueryString 체크
     const checkQueryString = () => {
@@ -22,10 +23,23 @@ exports.lookupAllProject = (req, res) => {
 
     // 2. 응답, Page 수에 맞는 최신 글 12개 리턴
     const resp = () => {
-        let list = Project.find().sort({_id : -1}).skip((pageNum-1)*returnNum).limit(returnNum).populate('pm_id')
+        let list = Project.find().sort({_id : -1}).skip((pageNum-1)*returnNum).limit(returnNum)
         list.exec((err, posts) => {
             if (err) throw err
-            res.status(200).json(posts)
+            else {
+                const postList = posts.map((post) => {
+                    return {
+                        title: post.title,
+                        text: post.text.substring(0, 30),
+                        startDate: moment(post.startDt).format('YYYY-MM-DD'),
+                        endDate: moment(post.endDt).format('YYYY-MM-DD'),
+                        hits: post.hits,
+                        applicantCount: post.applicant.length,
+                        writerId: post.userId
+                    }
+                })
+                res.status(200).json(postList)
+            }
         })
     }
     checkQueryString()
