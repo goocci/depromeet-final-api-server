@@ -32,11 +32,11 @@ exports.getMainProjectList = (req, res) => {
           return {
             title: project.title,
             text: project.text.substring(0, 30),
-            startDate: moment(project.startDt).format('YYYY-MM-DD'),
-            endDate: moment(project.endDt).format('YYYY-MM-DD'),
+            startDate: project.startDt,
+            endDate: project.endDt,
             hits: project.hits,
             applicantCount: project.applicant.length,
-            writerId: project.userId
+            writerId: project.writerId
           }
         })
 

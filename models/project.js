@@ -7,8 +7,8 @@ const Project = new Schema({
   writerId: String, // 사용자 고유 id(=작성자)
   title: String, // 제목
   text: String, // 본문
-  startDt: Date, // 프로젝트 시작일시
-  endDt: Date, // 프로젝트 끝일시
+  startDt: String, // 프로젝트 시작일시 (YYYY-MM-DD)
+  endDt: String, // 프로젝트 끝일시 (YYYY-MM-DD)
   skillCode: { // 필요 기술코드 목록
     designer: [String], // 디자이너 기술코드 목록
     developer: [String] // 개발자 기술코드 목록

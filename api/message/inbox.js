@@ -69,7 +69,7 @@ exports.getMyInboxList = (req, res) => {
         resolve({
           content: message.content.substring(0, 10),
           title: message.title,
-          receiveDate: moment(message.createDt).format('YYYY-MM-DD HH:mm:ss'),
+          receiveDate: moment(message.createdDt).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
           isRead: message.isRead,
           senderNickName: senderInfo.nickName
         })
