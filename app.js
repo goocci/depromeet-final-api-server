@@ -2,8 +2,6 @@
 
 require('dotenv').config({path:'./d4d_api_server.env'})
 const express = require('express')
-const http = require('http')
-const path = require('path')
 const app = express()
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
