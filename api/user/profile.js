@@ -55,7 +55,7 @@ exports.write = (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-exports.getProfile = (req, res) => {
+exports.getMyProfile = (req, res) => {
   const userId = req.query.userId
 
   // 0. 쿼리스트링 확인

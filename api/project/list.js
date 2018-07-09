@@ -30,6 +30,7 @@ exports.getMainProjectList = (req, res) => {
 
         const projectArr = results.results.map((project) => {
           return {
+            projectId: project._id,
             title: project.title,
             text: project.text.substring(0, 30),
             startDate: project.startDt,
