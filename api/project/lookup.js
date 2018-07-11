@@ -8,6 +8,8 @@ exports.lookupAllProject = (req, res) => {
     const pageNum = Number(req.query.page || req.body.page)
     const returnNum = Number(req.query.num || req.body.num) // 반환하는 프로젝트 수
 
+    let pagingInfo = {}
+
     //1. QueryString 체크
     const checkQueryString = () => {
         return new Promise((resolve, reject) => {
@@ -21,33 +23,67 @@ exports.lookupAllProject = (req, res) => {
     }
 
 
-    // 2. 응답, Page 수에 맞는 최신 글 12개 리턴
-    const resp = () => {
-        let list = Project.find().sort({_id : -1}).skip((pageNum-1)*returnNum).limit(returnNum)
-        list.exec((err, posts) => {
-            if (err) throw err
-            else {
-                const postList = posts.map((post) => {
-                    return {
-                        title: post.title,
-                        text: post.text.substring(0, 30),
-                        startDate: moment(post.startDt).format('YYYY-MM-DD'),
-                        endDate: moment(post.endDt).format('YYYY-MM-DD'),
-                        hits: post.hits,
-                        applicantCount: post.applicant.length,
-                        writerId: post.userId
-                    }
-                })
-                res.status(200).json(postList)
-            }
+    // 2. Page 수에 맞는 최신 글 12개 정보 요약
+    const MakeSimple = () => {
+        return new Promise((resolve, reject) => {
+            let list = Project.find().sort({_id : -1}).skip((pageNum-1)*returnNum).limit(returnNum)
+            list.exec((err, posts) => {
+                if (err) return reject(err)
+                else {
+                    const postList = posts.map((post) => {
+                        return {
+                            projectId: post._id,
+                            title: post.title,
+                            text: post.text.substring(0, 30),
+                            startDate: post.startDt,
+                            endDate: post.endDt,
+                            hits: post.hits,
+                            applicantCount: post.applicant.length,
+                            writerId: post.userId
+                        }
+                    })
+                    resolve(postList)
+                }
+            })
         })
     }
+
+    //3. postList 반환
+    const resp = (postList) => {
+        const newPostList = postList.map((project)=>{
+            return setWriterInfo(project)
+        })
+
+        res.status(200).json(newPostList)
+    }
+
+
     checkQueryString()
+        .then(MakeSimple)
         .then(resp)
         .catch((err) => {
             console.error(err)
             return res.status(500).json(err.message || err)
         })
+}
+
+const setWriterInfo = (projectInfo) => {
+    return new Promise((resolve, reject) => {
+        User.findOne({
+            userId: projectInfo.writerId
+        })
+            .then((userInfo) => {
+                projectInfo.writerInfo = {
+                    profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+                    nickName: userInfo.nickName
+                }
+
+                resolve(projectInfo)
+            })
+            .catch((err) => {
+                return reject(err)
+            })
+    })
 }
 
 exports.lookupDetail = (req, res) => {
