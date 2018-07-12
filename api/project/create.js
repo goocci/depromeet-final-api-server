@@ -12,21 +12,17 @@ const utils = require('../../utils')
 exports.createProject = (req, res) => {
   const userId = req.body.userId
   const title = req.body.title
+  const text = req.body.text
   const startDt = req.body.startDate
   const endDt = req.body.endDate
-  const text = req.body.text
-  const skillCodeDesigner = req.body.skillCodeDesigner
-  const skillCodeDeveloper = req.body.skillCodeDeveloper
+  const positionNeed = req.body.positionNeed
 
   let projectInfo
-  let userInfo
-  let designerSkillArr = []
-  let developerSkillArr = []
 
   // 0. 요청 바디 확인
   const checkReqBody = () => {
     return new Promise((resolve, reject) => {
-      if (!userId || !title || !text || !skillCodeDesigner || !skillCodeDeveloper) {
+      if (!userId || !title || !text || !startDt || !endDt || !positionNeed) {
         return reject({
           code: 'request_body_error',
           message: 'request body is not defined'
@@ -52,6 +48,25 @@ exports.createProject = (req, res) => {
 
   // 2. 프로젝트 생성
   const createNewProject = (attachmentsArr) => {
+    const positionNeedArr = JSON.parse(positionNeed).map((positionName) => {
+      let imageUrl
+      switch (positionName) {
+        case 'ui-designer':
+          imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-ui%403x.png'
+        case 'ux-designer': 
+          imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-ux%403x.png'
+        case 'frontend':
+          imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-front%403x.png'
+        case 'backend':
+          imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-back%403x.png'
+      }
+
+      return {
+        name: positionName,
+        image: imageUrl
+      }
+    })
+
     return Project
           .create({
             writerId: userId,
@@ -59,10 +74,7 @@ exports.createProject = (req, res) => {
             text: text,
             startDt: startDt,
             endDt: endDt,
-            skillCode: {
-              designer: JSON.parse(skillCodeDesigner),
-              developer: JSON.parse(skillCodeDeveloper)
-            },
+            positionNeed: positionNeedArr,
             attachments: attachmentsArr,
             applicant: []
           })
@@ -74,23 +86,8 @@ exports.createProject = (req, res) => {
     return User.findOne({ userId: userId })
   }
 
-  // 4. 기술코드 파싱
-  const parseProjectSkillCode = (result) => {
-    return new Promise((resolve, reject) => {
-      userInfo = result
-      async function parseCode() {
-        designerSkillArr = await utils.parseSkillCode.getSkillCodeName('designer', projectInfo.skillCode.designer)
-        developerSkillArr = await utils.parseSkillCode.getSkillCodeName('developer', projectInfo.skillCode.developer)
-  
-        resolve()
-      }
-  
-      parseCode()
-    })
-  }
-
-  // 5. 응답
-  const resp = () => {
+  // 4. 응답
+  const resp = (userInfo) => {
     let attachments = projectInfo.attachments.map((att) => {
       return {
         fileName: att.fileName,
@@ -98,36 +95,49 @@ exports.createProject = (req, res) => {
       }
     })
 
-    let response = {
-      projectInfo: {
-        projectId: projectInfo._id,
-        skill: {
-          designer: designerSkillArr,
-          developer: developerSkillArr
+    async function parseCode() {
+      const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
+      const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
+      const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
+
+      let response = {
+        projectInfo: {
+          projectId: projectInfo._id,
+          positionNeed: projectInfo.positionNeed,
+          hits: projectInfo.hits,
+          title: projectInfo.title,
+          text: projectInfo.text,
+          startDate: startDt,
+          endDate: endDt,
+          attachments: attachments,
+          comments: projectInfo.comments
         },
-        hits: projectInfo.hits,
-        title: projectInfo.title,
-        text: projectInfo.text,
-        startDate: startDt,
-        endDate: endDt,
-        attachments: attachments
-      },
-      writerInfo: {
-        writerId: userInfo.userId,
-        nickName: userInfo.nickName,
-        profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
-      },
-      isWriter: true // 프로젝트 생성자가 무조건 작성자
+        writerInfo: {
+          writerId: userInfo.userId,
+          nickName: userInfo.nickName,
+          profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+          area: userInfo.area || '',
+          position: userInfo.position || '',
+          contact: userInfo.contact || '',
+          skill: {
+            design: designSkillArr,
+            frontend: frontendSkillArr,
+            backend: backendSkillArr
+          }
+        },
+        isWriter: true // 프로젝트 생성자가 무조건 작성자
+      }
+  
+      res.status(200).json(response)
     }
 
-    res.status(200).json(response)
+    parseCode()
   }
 
   checkReqBody()
   .then(checkAttachments)
   .then(createNewProject)
   .then(getWriterInfo)
-  .then(parseProjectSkillCode)
   .then(resp)
   .catch((err) => {
     console.error(err)

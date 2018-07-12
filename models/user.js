@@ -25,10 +25,22 @@ const User = new Schema({
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
   introduction: String, // 자기 소개
   skillCode: { // 보유 기술코드 목록
-    design: [String], // 디자인 기술코드 목록
-    frontend: [String], // 프론트엔드 기술코드 목록
-    backend: [String] // 백엔드 기술코드 목록
-  }
+    design: [{ // 디자인 기술코드 목록
+      code: String, // 코드
+      score: Number, // 숙련도
+    }],
+    frontend: [{ // 프론트엔드 기술코드 목록
+      code: String, // 코드
+      score: Number, // 숙련도
+    }], 
+    backend: [{ // 백엔드 기술코드 목록
+      code: String, // 코드
+      score: Number, // 숙련도
+    }]
+  },
+  position: String, // 포지션
+  area: String, // 지역
+  contact: String // 연락처
 },
 {collection: 'user'}
 )

@@ -17,11 +17,12 @@ exports.getSkillCodeName = (type, skillCodeArr) => {
     })
     .then((result) => {
       const skillCodeNameArr = skillCodeArr.map((skillCode) => {
-        const item = _.find(result.items, { code: skillCode })
+        const item = _.find(result.items, { code: skillCode.code })
         return {
-          code: skillCode,
+          code: skillCode.code,
           codeName: item.codeName,
-          image: item.image
+          image: item.image,
+          score: skillCode.score
         }
       })
   

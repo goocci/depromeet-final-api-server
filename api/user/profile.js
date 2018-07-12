@@ -113,7 +113,10 @@ exports.getMyProfile = (req, res) => {
         design: data.designSkillArr,
         frontend: data.frontendSkillArr,
         backend: data.backendSkillArr
-      }
+      },
+      area: userInfo.area || '',
+      position: userInfo.position || '',
+      contact: userInfo.contact || ''
     })
   }
 
