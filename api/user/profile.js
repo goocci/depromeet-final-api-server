@@ -6,6 +6,7 @@ const utils = require('../../utils')
 exports.write = (req, res) => {
     const userId = req.body.uId || req.query.uId
     const introduction = req.body.introduction || req.query.introduction
+    const profileImage =  req.body.image
 
     //1. QueryString 체크
     const CheckQueryString = () => {
@@ -19,7 +20,7 @@ exports.write = (req, res) => {
         })
     }
 
-    //2. User Id 존재하는지 판별 후, Introduction 수정
+    //2. User Id 존재하는지 판별 후, Profile Image 업로드 및 Introduction 수정
     const CheckUserExist = () => {
         return new Promise((resolve, reject) => {
             User.findOne({_id: userId}).exec((err, user)=>{
