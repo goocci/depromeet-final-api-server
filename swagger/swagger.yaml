@@ -83,7 +83,7 @@ paths:
       parameters :
         - in : query
           name : type
-          description : 기술코드 종류 ("designer" or "frontend" or "backend")
+          description : 기술코드 종류 ("design" or "frontend" or "backend")
           required : true
       responses:
         '200':
@@ -93,7 +93,7 @@ paths:
             properties :
               codeType:
                 type: string
-                description: 기술코드 목록 구분 ("designer" or "developer")
+                description: 기술코드 목록 구분 ("design" or "frontend" or "backend")
               items:
                 type: array
                 items:
@@ -361,9 +361,9 @@ paths:
               skill:
                 type: object
                 properties:
-                  designer:
+                  design:
                     type: array
-                    description: 디자이너 기술 목록
+                    description: 디자인 기술 목록
                     items:
                       type: object
                       properties:
@@ -373,9 +373,12 @@ paths:
                         codeName:
                           type: string
                           description: 기술코드명
-                  developer:
+                        image:
+                          type: string
+                          description: 기술 로고이미지
+                  frontend:
                     type: array
-                    description: 개발자 기술 목록
+                    description: 프론트엔드 기술 목록
                     items:
                       type: object
                       properties:
@@ -385,6 +388,24 @@ paths:
                         codeName:
                           type: string
                           description: 기술코드명
+                        image:
+                          type: string
+                          description: 기술 로고이미지
+                  backend:
+                    type: array
+                    description: 백엔드 기술 목록
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: 기술코드
+                        codeName:
+                          type: string
+                          description: 기술코드명
+                        image:
+                          type: string
+                          description: 기술 로고이미지
         '500':
           description: 나의 프로필 정보 조회 실패
   /message/send:

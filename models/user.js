@@ -25,8 +25,9 @@ const User = new Schema({
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
   introduction: String, // 자기 소개
   skillCode: { // 보유 기술코드 목록
-    designer: [String], // 디자이너 기술코드 목록
-    developer: [String] // 개발자 기술코드 목록
+    design: [String], // 디자인 기술코드 목록
+    frontend: [String], // 프론트엔드 기술코드 목록
+    backend: [String] // 백엔드 기술코드 목록
   }
 },
 {collection: 'user'}

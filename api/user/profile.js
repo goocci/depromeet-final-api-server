@@ -79,13 +79,15 @@ exports.getMyProfile = (req, res) => {
   const parseSkillCode = (userInfo) => {
     return new Promise((resolve, reject) => {
       async function parseCode() {
-        const designerSkillArr = await utils.parseSkillCode.getSkillCodeName('designer', userInfo.skillCode.designer)
-        const developerSkillArr = await utils.parseSkillCode.getSkillCodeName('developer', userInfo.skillCode.developer)
+        const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
+        const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
+        const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
   
         resolve({
           userInfo: userInfo,
-          designerSkillArr: designerSkillArr,
-          developerSkillArr: developerSkillArr
+          designSkillArr: designSkillArr,
+          frontendSkillArr: frontendSkillArr,
+          backendSkillArr: backendSkillArr
         })
       }
   
@@ -108,8 +110,9 @@ exports.getMyProfile = (req, res) => {
       profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
       introduction: userInfo.introduction || '',
       skill: {
-        designer: data.designerSkillArr,
-        developer: data.developerSkillArr
+        design: data.designSkillArr,
+        frontend: data.frontendSkillArr,
+        backend: data.backendSkillArr
       }
     })
   }
