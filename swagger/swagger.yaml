@@ -638,3 +638,407 @@ paths:
                       description: 받는이 여부 여부
         '500':
           description: 나의 보낸쪽지함 목록 조회
+  /project/lookupAll:
+    post:
+      tags:
+        - project
+      summary: 전체 프로젝트 페이지 별로 조회
+      description: 전체 프로젝트 페이지 별로 조회
+      parameters:
+        - in: body
+          name: page
+          description: 페이지 번호
+          type: number
+          required: true
+        - in: body
+          name: num
+          description: 페이지당 넘기고 싶은 수
+          type: number
+          required: true
+      responses:
+        '200':
+          description : 반환 성공
+          schema:
+            type: Array
+            items:
+              type: Object
+              properties:
+                projectId:
+                  type: string
+                  description: Project ID
+                title:
+                  type: string
+                  description: 제목
+                text:
+                  type: string
+                  description: 내용
+                startDate:
+                  type: string
+                  description: 프로젝트 시작날짜
+                endDate:
+                  type: string
+                  description: 프로젝트 끝날짜
+                hits:
+                  type: number
+                  description: 조회수
+                applicantCount:
+                  type: number
+                  description: 지원자수
+                writerId:
+                  type: string
+                  description: 작성자 고유 id
+                writerInfo:
+                  type: object
+                  description: 작성자 정보
+                  properties:
+                    profileImage:
+                      type: string
+                      description: 프로필 이미지 URL
+                    nickName:
+                      type: string
+                      description: 닉네임
+  /project/lookupDetail:
+    post:
+      tags:
+        - Project
+      summary: Project ID로 상세 내용 조회
+      description: Project ID로 상세 내용 조회
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+      responses:
+        '200':
+          decription: 반환 성공, 프로젝트 미 존재시 빈 객체 반환
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: Project ID
+              skillCode:
+                type: object
+                description: PM이 원하는 기술 코드가 담긴 object
+                property:
+                  designer:
+                    type: array
+                    description: 디자인 Skill Code
+                    items:
+                      type: string
+                  developer:
+                    type: array
+                    description: 개발자 Skill Code
+                    items:
+                      type: string
+              hits:
+                type: number
+                description: 조회수
+              writerId:
+                type: string
+                description: 작성자 ID
+              title:
+                type: string
+                description: 프로젝트 제목
+              text:
+                type: string
+                description: 프로젝트 소개
+              startDt:
+                type: string
+                description: 프로젝트 시작 날짜
+              endDt:
+                type: string
+                description: 프로젝트 종료 날짜
+              attachments:
+                type: array
+                description: 첨부 파일
+                items:
+                  type: object
+                  properties:
+                    fileName:
+                      type: string
+                      description: 파일명
+                    s3Location:
+                      type: string
+                      description: AWS S3 경로
+                    size:
+                      type: number
+                      description: 파일 사이즈
+              applicant:
+                type: array
+                description: 지원자 목록
+                items:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                      description: 지원자 userId
+                    join:
+                      type: boolean
+                      description: 지원 승인 여부
+                    contents:
+                      type: string
+                      description: 지원 메세지
+              createdDt:
+                type: date
+                description: 생성 일자
+              updatedDt:
+                type: date
+                description: 업데이트 일자
+              comments:
+                type: array
+                descripton: 댓글 목록
+                items:
+                  type: object
+                  properties:
+                    commeterId:
+                      type: string
+                      description: 댓글 작성자 Id
+                    contents:
+                      type: string
+                      description: 댓글 내용
+                    date:
+                      type: date
+                      description: 댓글 작성 일시
+        '500':
+          description: 요청 실패
+  /project/comments:
+    post:
+      tags:
+        - Project
+      summary: 댓글 조회
+      description: 댓글 조회
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 반환 성공
+          schema:
+            type: array
+            description: 댓글 배열
+            items:
+              type: object
+              properties:
+                commenterId:
+                  type: string
+                  description: 댓글 작성자 ID
+                contents:
+                  type: string
+                  description: 댓글 내용
+                date:
+                  type: date
+                  description: 댓글 작성 일자
+  /project/addComment:
+    post:
+      tags:
+        - Project
+      summary: 댓글 추가
+      description: 댓글 추가
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: uId
+          description: User ID
+          type: string
+          required: true
+        - in: body
+          name: contents
+          description: 댓글 내용
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 등록 성공
+          schema:
+            type: array
+            description: 댓글 배열
+            items:
+              type: object
+              properties:
+                commenterId:
+                  type: string
+                  description: 댓글 작성자 ID
+                contents:
+                  type: string
+                  description: 댓글 내용
+                date:
+                  type: date
+                  description: 댓글 작성 일자
+        '500':
+          description: 요청 실패
+  /project/deleteComment:
+    post:
+      tags:
+        - Project
+      summary: 댓글 삭제
+      description: 댓글 삭제
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: cId
+          description: Comment ID
+          type: string
+          required: true
+        - in: body
+          name: uId
+          description: User ID 혹은 PM ID
+      responses:
+        '200':
+          description: 삭제 성공
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                description: 삭제 성공 여부
+              removedByPM:
+                type: boolean
+                description: PM에 의한 삭제 여부
+        '500':
+          description: 요청 실패
+  /project/apply:
+    post:
+      tags:
+        - Project
+      summery: 프로젝트 지원
+      description: 프로젝트 지원
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: uId
+          description: User ID
+          type: string
+          required: true
+        - in: body
+          name: contents
+          description: 댓글 내용
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 요청 성공
+          schema:
+            type: object
+            description: 지원 성공 여부가 담긴 객체
+              applySuccess:
+                type: boolean
+                description: 지원 성공 여부, false는 중복 지원 시 반환
+        '500':
+          description: 요청 실패
+  /project/applyCancel:
+    post:
+      tags:
+        - Project
+      summary: 지원 취소
+      description: 지원 취소
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: uId
+          description: User ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 요청 성공
+          schema:
+            type: object
+            description: 삭제 성공 여부가 담긴 객체
+            properties:
+              DeleteSuccess:
+                type: boolean
+                description: 삭제 성공 여부, false는 이미 존재하지 않는 지원 목록일시
+        '500':
+          description: 요청 실패
+  /project/applyList:
+    post:
+      tags:
+        - Project
+      summary: 지원 목록 반환
+      description: 지원 목록 반환
+      parameters:
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: PMId
+          description: Project Master ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 요청 성공
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: 요청 객체 아이디
+                userId:
+                  type: string
+                  description: 유저 아이디
+                join:
+                  type: boolean
+                  description: 지원 승인 여부
+                contents:
+                  type: string
+                  description: 지원 동기
+        '500':
+          description: 요청 실패
+  /project/applyToggle:
+    post:
+      tags:
+        - Project
+      summary: 지원 승인여라 토글(true to false, false to true)
+      description: 지원 승인여부 토글(true to false, false to true)
+      parameters:
+        - in: body
+          name: uId
+          descripion: 지원 승인 여부를 토글하기 위해서 사용
+          type: string
+          required: true
+        - in: body
+          name: pId
+          description: Project ID
+          type: string
+          required: true
+        - in: body
+          name: PMId
+          description: Project Master ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 요청 성공
+          schema:
+            type: object
+            description: 승인 여부에 대한 정보가 담겨있는 객체
+            properties:
+              join:
+                type: boolean
+                description: true일시, false가 true로 변한 것, false일시, false가 true로 변한 것

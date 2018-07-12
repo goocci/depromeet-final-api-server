@@ -98,14 +98,15 @@ exports.AddComment = (req, res) => {
 
     //4. 최종 결과 반환
     const Results = (Proj) => {
-        Proj.comments.push({
+        let comment = {
             commenterId: userId,
             contents: Contents,
             date: Date.now()
-        })
+        }
+        Proj.comments.push(comment)
         Proj.save((err, object) => {
             if (err) throw err
-            res.status(200).send(Proj)
+            res.status(200).send(comment)
         })
     }
 
