@@ -3,7 +3,7 @@
 const SkillCode = require("../../models/skillCode")
 
 /**
- *기술코드 목록 조회
+ * 기술코드 목록 조회
  * @param {*} req
  * @param {*} res
  */

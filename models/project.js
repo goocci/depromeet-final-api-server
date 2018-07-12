@@ -9,10 +9,10 @@ const Project = new Schema({
   text: String, // 본문
   startDt: String, // 프로젝트 시작일시 (YYYY-MM-DD)
   endDt: String, // 프로젝트 끝일시 (YYYY-MM-DD)
-  skillCode: { // 필요 기술코드 목록
-    designer: [String], // 디자이너 기술코드 목록
-    developer: [String] // 개발자 기술코드 목록
-  },
+  positionNeed: [{ // 필요 포지션 목록
+    name: String, // 포지션명
+    image: String // 포지션 이미지
+  }],
   attachments: [{ // 첨부파일 목록
     fileName: String, // 파일명
     s3Location: String, // AWS S3 경로
