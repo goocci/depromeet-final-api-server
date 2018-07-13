@@ -20,7 +20,7 @@ exports.write = (req, res) => {
         })
     }
 
-    //2. User Id 존재하는지 판별 후, Profile Image 업로드 및 Introduction 수정
+    //2. User Id 존재하는지 판별 후, Introduction 수정
     const CheckUserExist = () => {
         return new Promise((resolve, reject) => {
             User.findOne({_id: userId}).exec((err, user)=>{
@@ -34,16 +34,29 @@ exports.write = (req, res) => {
                 else {
                     user.introduction = introduction
                     user.updatedDt = Date.now()
-                    user.save((err, obj) =>{
-                        if(err) throw err
-                        res.status(200).json(obj)
-                    })
+                    resolve(user)
                 }
             })
         })
     }
+
+    //3. Image File Upload
+    const imageUpload = (user) =>{
+        if (req.file){
+            user.profileImage.original.fileName = req.file.filename
+            user.profileImage.original.s3Location = req.file.location
+            user.profileImage.original.size = req.file.size
+        }
+        user.save((err, obj) =>{
+            if(err) throw err
+            res.status(200).json(obj)
+        })
+    }
+
+
     CheckQueryString()
         .then(CheckUserExist)
+        .then(imageUpload)
         .catch((err)=>{
             if(err){
                 res.status(500).json(err)
