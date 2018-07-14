@@ -31,7 +31,8 @@ exports.apply = (req, res) => {
                         message: 'user doesn\'t exist'
                     })
                 }
-            })
+            }) // User 존재 여부
+
             Project.findOne({_id: projectId}).exec((err, proj) => {
                 if (err) throw err
                 if (!proj) {

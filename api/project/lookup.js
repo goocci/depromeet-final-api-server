@@ -5,8 +5,8 @@ const moment = require("moment")
 
 exports.lookupAllProject = (req, res) => {
     //0. Page 수 확인
-    const pageNum = Number(req.query.page || req.body.page)
-    const returnNum = Number(req.query.num || req.body.num) // 반환하는 프로젝트 수
+    const pageNum = Number(req.query.page)
+    const returnNum = Number(req.query.num) // 반환하는 프로젝트 수
 
     let pagingInfo = {}
 
@@ -88,7 +88,7 @@ const setWriterInfo = (projectInfo) => {
 
 exports.lookupDetail = (req, res) => {
     //0. Project id 입력받음
-    const pId = req.query.id || req.body.id
+    const pId = req.query.id
 
     //1. QueryString 체크
     const checkQueryString = () => {
@@ -108,7 +108,7 @@ exports.lookupDetail = (req, res) => {
             if (err) throw err
 
             if (!proj){
-                res.status(200).json({empty : 1})
+                res.status(200).json({})
             }
             else {
                 res.status(200).json(proj)

@@ -693,10 +693,10 @@ paths:
                       type: string
                       description: 지원 메세지
               createdDt:
-                type: date
+                type: Date
                 description: 생성 일자
               updatedDt:
-                type: date
+                type: Date
                 description: 업데이트 일자
               comments:
                 type: array
@@ -711,7 +711,7 @@ paths:
                       type: string
                       description: 댓글 내용
                     date:
-                      type: date
+                      type: Date
                       description: 댓글 작성 일시
         '500':
           description: 요청 실패
@@ -736,6 +736,9 @@ paths:
             items:
               type: object
               properties:
+                allowDelete:
+                  type: boolean
+                  description: 삭제 가능 여부
                 commenterId:
                   type: string
                   description: 댓글 작성자 ID
@@ -926,7 +929,7 @@ paths:
     post:
       tags:
         - Project
-      summary: 지원 승인여라 토글(true to false, false to true)
+      summary: 지원 승인여부 토글(true to false, false to true)
       description: 지원 승인여부 토글(true to false, false to true)
       parameters:
         - in: body
