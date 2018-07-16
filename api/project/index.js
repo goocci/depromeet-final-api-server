@@ -7,6 +7,7 @@ const lookup = require('./lookup')
 const apply = require('./apply')
 const comment = require('./comment')
 const list = require('./list')
+const applicant = require('./applicant')
 const multerS3 = require('../middlewares/multer-s3') // 파일 업로드
 
 router.post('/lookupAll', lookup.lookupAllProject) // 전체 프로젝트 조회
@@ -22,5 +23,7 @@ router.post('/apply', apply.apply) // 프로젝트 지원
 router.post('/applyCancel', apply.applyCancel) // 지원 취소
 router.post('/applyList', apply.applyList) // 지원 목록
 router.post('/applyToggle', apply.applyToggle) // 지원 토글(true to false, false to true)
+
+router.get('/applicant/list', applicant.getApplicantList) // 지원자 목록 조회
 
 module.exports = router
