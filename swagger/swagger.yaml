@@ -600,6 +600,105 @@ paths:
                           description: 숙련도
         '500':
           description: 나의 프로필 정보 조회 실패
+  /project/applicant/list:
+    get:
+      tags:
+        - Project
+      summary : 프로젝트 지원자 목록 조회
+      description : 프로젝트 지원자 목록 조회
+      parameters :
+        - in : query
+          name : projectId
+          description : 프로젝트 고유 id
+          required : true
+      responses:
+        '200':
+          description : 지원자 목록
+          schema:
+            type: array
+            items:
+              type : object
+              properties :
+                userId:
+                  type: string
+                  description: 사용자 고유 id
+                nickName:
+                  type: string
+                  description: 닉네임
+                profileImage:
+                  type: string
+                  description: 프로필 이미지 URL
+                area:
+                  type: string
+                  description: 지역
+                position:
+                  type: string
+                  description: 포지션
+                contact:
+                  type: string
+                  description: 연락처
+                projectCount:
+                  type: number
+                  description: 프로젝트 진행 수
+                skill:
+                  type: object
+                  properties:
+                    design:
+                      type: array
+                      description: 디자인 기술 목록
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            description: 기술코드
+                          codeName:
+                            type: string
+                            description: 기술코드명
+                          image:
+                            type: string
+                            description: 기술 로고이미지
+                          score:
+                            type: number
+                            description: 숙련도
+                    frontend:
+                      type: array
+                      description: 프론트엔드 기술 목록
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            description: 기술코드
+                          codeName:
+                            type: string
+                            description: 기술코드명
+                          image:
+                            type: string
+                            description: 기술 로고이미지
+                          score:
+                            type: number
+                            description: 숙련도
+                    backend:
+                      type: array
+                      description: 백엔드 기술 목록
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            description: 기술코드
+                          codeName:
+                            type: string
+                            description: 기술코드명
+                          image:
+                            type: string
+                            description: 기술 로고이미지
+                          score:
+                            type: number
+                            description: 숙련도
+        '500':
+          description: 프로젝트 지원자 목록 조회 실패
   /message/send:
     post:
       tags:
