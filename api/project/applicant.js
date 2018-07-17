@@ -38,9 +38,18 @@ exports.getApplicantList = (req, res) => {
     return Promise.all(findMany)
   }
 
+  // 3. 프로젝트 진행수 산출
+  const getProjectCount = (applicantList) => {
+    const findMany = applicantList.map((applicant) => {
+      return setProjectCount(applicant)
+    })
+
+    return Promise.all(findMany)
+  }
+
   // 3. 응답
-  const resp = (result) => {
-    res.status(200).json(result)
+  const resp = (applicantList) => {
+    res.status(200).json(applicantList)
   }
 
   // [Func] 사용자 정보 세팅
@@ -51,7 +60,7 @@ exports.getApplicantList = (req, res) => {
         userId: applicant.userId
       })
       .then((userInfo) => {
-        async function parseCode() {
+        async function parseCode () {
           const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
           const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
           const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
@@ -68,7 +77,7 @@ exports.getApplicantList = (req, res) => {
               frontend: frontendSkillArr,
               backend: backendSkillArr
             },
-            projectCount: 0, // [TODO] 프로젝트 진행 수
+            projectCount: 0 // [TODO] 프로젝트 진행수
           })
         }
 
@@ -80,9 +89,40 @@ exports.getApplicantList = (req, res) => {
     })
   }
 
+  // [Func] 프로젝트 진행수 산출
+  const setProjectCount = (applicant) => {
+    return new Promise((resolve, reject) => {
+      Project
+      .find({
+        $or: [
+          {
+            writerId: applicant.userId
+          },
+          {
+            applicant: {
+              $elemMatch: {
+                userId: applicant.userId,
+                join: true
+              }
+            }
+          }
+        ]
+      })
+      .count()
+      .then((projectCount) => {
+        applicant.projectCount = projectCount
+        resolve(applicant)
+      })
+      .catch((err) => {
+        return reject(err)
+      })
+    })
+  }
+
   checkQueryString()
   .then(getProjectApplicantList)
   .then(setApplicantInfo)
+  .then(getProjectCount)
   .then(resp)
   .catch((err) => {
     console.error(err)

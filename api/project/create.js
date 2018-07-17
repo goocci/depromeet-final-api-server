@@ -53,12 +53,18 @@ exports.createProject = (req, res) => {
       switch (positionName) {
         case 'ui-designer':
           imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-ui%403x.png'
-        case 'ux-designer': 
+          break
+        case 'ux-designer':
           imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-ux%403x.png'
+          break
         case 'frontend':
           imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-front%403x.png'
+          break
         case 'backend':
           imageUrl = 'https://s3.ap-northeast-2.amazonaws.com/d4d-bucket/ic-back%403x.png'
+          break
+        default:
+          imageUrl = ''
       }
 
       return {
@@ -95,7 +101,7 @@ exports.createProject = (req, res) => {
       }
     })
 
-    async function parseCode() {
+    async function parseCode () {
       const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
       const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
       const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
@@ -127,7 +133,7 @@ exports.createProject = (req, res) => {
         },
         isWriter: true // 프로젝트 생성자가 무조건 작성자
       }
-  
+
       res.status(200).json(response)
     }
 
