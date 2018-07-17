@@ -231,6 +231,9 @@ paths:
                   contact:
                     type: string
                     description: 연락처
+                  projectCount:
+                    type: number
+                    description: 프로젝트 진행수
                   skill:
                     type: object
                     properties:
