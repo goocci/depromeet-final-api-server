@@ -92,59 +92,96 @@ exports.createProject = (req, res) => {
     return User.findOne({ userId: userId })
   }
 
-  // 4. 응답
-  const resp = (userInfo) => {
-    let attachments = projectInfo.attachments.map((att) => {
-      return {
-        fileName: att.fileName,
-        downloadUrl: att.s3Location
-      }
-    })
+  // 4. 응답 데이터 Setting
+  const setRespData = (userInfo) => {
+    return new Promise((resolve, reject) => {
+      let attachments = projectInfo.attachments.map((att) => {
+        return {
+          fileName: att.fileName,
+          downloadUrl: att.s3Location
+        }
+      })
 
-    async function parseCode () {
-      const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
-      const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
-      const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
+      async function parseCode () {
+        try {
+          const designSkillArr = await utils.parseSkillCode.getSkillCodeName('design', userInfo.skillCode.design)
+          const frontendSkillArr = await utils.parseSkillCode.getSkillCodeName('frontend', userInfo.skillCode.frontend)
+          const backendSkillArr = await utils.parseSkillCode.getSkillCodeName('backend', userInfo.skillCode.backend)
 
-      let response = {
-        projectInfo: {
-          projectId: projectInfo._id,
-          positionNeed: projectInfo.positionNeed,
-          hits: projectInfo.hits,
-          title: projectInfo.title,
-          text: projectInfo.text,
-          startDate: startDt,
-          endDate: endDt,
-          attachments: attachments,
-          comments: projectInfo.comments
-        },
-        writerInfo: {
-          writerId: userInfo.userId,
-          nickName: userInfo.nickName,
-          profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
-          area: userInfo.area || '',
-          position: userInfo.position || '',
-          contact: userInfo.contact || '',
-          skill: {
-            design: designSkillArr,
-            frontend: frontendSkillArr,
-            backend: backendSkillArr
+          let response = {
+            projectInfo: {
+              projectId: projectInfo._id,
+              positionNeed: projectInfo.positionNeed,
+              hits: projectInfo.hits,
+              title: projectInfo.title,
+              text: projectInfo.text,
+              startDate: startDt,
+              endDate: endDt,
+              attachments: attachments,
+              comments: projectInfo.comments
+            },
+            writerInfo: {
+              writerId: userInfo.userId,
+              nickName: userInfo.nickName,
+              profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+              area: userInfo.area || '',
+              position: userInfo.position || '',
+              contact: userInfo.contact || '',
+              skill: {
+                design: designSkillArr,
+                frontend: frontendSkillArr,
+                backend: backendSkillArr
+              },
+              projectCount: 0
+            },
+            isWriter: true // 프로젝트 생성자가 무조건 작성자
           }
-        },
-        isWriter: true // 프로젝트 생성자가 무조건 작성자
+          resolve(response)
+        } catch (err) {
+          return reject(err)
+        }
       }
 
-      res.status(200).json(response)
-    }
+      parseCode()
+    })
+  }
 
-    parseCode()
+  // 5. 작성자 프로젝트 진행수 산출 및 응답
+  const getProjectCountAndResp = (response) => {
+    return new Promise((resolve, reject) => {
+      Project
+      .find({
+        $or: [
+          {
+            writerId: response.writerInfo.writerId
+          },
+          {
+            applicant: {
+              $elemMatch: {
+                userId: response.writerInfo.writerId,
+                join: true
+              }
+            }
+          }
+        ]
+      })
+      .count()
+      .then((projectCount) => {
+        response.writerInfo.projectCount = projectCount
+        res.status(200).json(response)
+      })
+      .catch((err) => {
+        return reject(err)
+      })
+    })
   }
 
   checkReqBody()
   .then(checkAttachments)
   .then(createNewProject)
   .then(getWriterInfo)
-  .then(resp)
+  .then(setRespData)
+  .then(getProjectCountAndResp)
   .catch((err) => {
     console.error(err)
     return res.status(500).json(err.message || err)
