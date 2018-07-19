@@ -27,15 +27,15 @@ const User = new Schema({
   skillCode: { // 보유 기술코드 목록
     design: [{ // 디자인 기술코드 목록
       code: String, // 코드
-      score: Number, // 숙련도
+      score: Number // 숙련도
     }],
     frontend: [{ // 프론트엔드 기술코드 목록
       code: String, // 코드
-      score: Number, // 숙련도
-    }], 
+      score: Number // 숙련도
+    }],
     backend: [{ // 백엔드 기술코드 목록
       code: String, // 코드
-      score: Number, // 숙련도
+      score: Number // 숙련도
     }]
   },
   position: String, // 포지션
