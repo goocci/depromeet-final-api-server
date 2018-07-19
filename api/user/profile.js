@@ -2,7 +2,7 @@
 
 const User = require("../../models/user")
 const utils = require('../../utils')
-const multer = require('../middlewares/multer-s3-image')
+const path = require('path')
 
 exports.write = (req, res) => {
     const userId = req.body.uId || req.query.uId
@@ -43,11 +43,14 @@ exports.write = (req, res) => {
     //3. Image File Upload
     const imageUpload = (user) =>{
         if (req.file){
-            user.profileImage.original.fileName = req.file.filename || ''
-            user.profileImage.original.s3Location = req.file.location || ''
+            let fileName = path.basename(req.file.location)
+            let dirname = path.dirname(req.file.location)
+            let resizedDirname = dirname.replace('images/original', 'copy/images')
+            user.profileImage.original.fileName = fileName || ''
+            user.profileImage.original.s3Location = dirname || ''
             user.profileImage.original.size = req.file.size || ''
-            user.profileImage.resized.fileName = req.file.filename || ''
-            user.profileImage.resized.s3Location = req.file.location.slice(0,-8) + 'copy' || ''
+            user.profileImage.resized.fileName = fileName || ''
+            user.profileImage.resized.s3Location = resizedDirname || ''
             user.profileImage.resized.size = req.file.size || '' // 어캐 구현 하죠..?
         }
         user.save((err, obj) =>{

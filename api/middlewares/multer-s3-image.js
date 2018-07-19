@@ -20,7 +20,7 @@ const uploadFileToS3 = {
         acl: 'public-read',
         key: (req, file, cb) => {
             // make unique value with timestamp
-            let path = `${file.fieldname}/images/original/${Date.now()}_${file.originalname}`
+            let path = `${file.fieldname}/original/${Date.now()}_${file.originalname}`
             cb(null, path)
         }
     })

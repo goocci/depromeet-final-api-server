@@ -10,7 +10,7 @@ const momentTz = require('moment-timezone')
 // Mongoose Query Paginate
 require('mongoose-query-paginate')
 
-// MongoDB Connectiong
+// MongoDB Connection
 mongoose.Promise = global.Promise
 mongoose.connect(process.env.MONGO_URI_DEV)
 var db = mongoose.connection
