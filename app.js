@@ -6,6 +6,10 @@ const app = express()
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const momentTz = require('moment-timezone')
+const morgan = require('morgan')
+
+// http logger
+app.use(morgan('[:date[iso]] :method :status :url :response-time(ms) :user-agent'))
 
 // Mongoose Query Paginate
 require('mongoose-query-paginate')
@@ -15,7 +19,7 @@ mongoose.Promise = global.Promise
 mongoose.connect(process.env.MONGO_URI_DEV)
 var db = mongoose.connection
 db.once('open', function () {
-   console.log('MongoDB connected!')
+  console.log('MongoDB connected!')
 })
 db.on('error', function (err) {
   console.log('MongoDB ERROR:', err)
