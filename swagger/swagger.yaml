@@ -957,3 +957,106 @@ paths:
               join:
                 type: boolean
                 description: true일시, false가 true로 변한 것, false일시, false가 true로 변한 것
+        '500':
+          description: 요청 실패
+  /user/profileWrite:
+    post:
+      tags:
+        - User
+      summary: 마이 페이지 작성 및 수정
+      description: 마이 페이지 작성 및 수정
+      parameters:
+        - in: body
+          name: images
+          description: 바꾸자 하는 프로필 사진
+          type: file
+          required: false
+        - in: body
+          name: uId
+          description: 유저의 ID
+          type: string
+          required: true
+        - in: body
+          name: introduction
+          description: 자기 소개의 글
+          type: string
+          required: true
+        - in: body
+          name: devSkill
+          description: 개발 스택, 여러 개를 받을 수 있다.
+          type: string
+          required: true
+        - in: body
+          name: desSkill
+          description: 디자인 스택, 여러 개를 받을 수 있다.
+          type: string
+          required: true
+        - in: body
+          name: email
+          description: 이메일
+          type: string
+          required: true
+        - in: body
+          name: area
+          description: 지역
+          type: string
+          required: true
+      responses:
+        '200':
+          description: 요청 성공
+          schema:
+            type: object
+            description: 업데이트 성공 한 유저 객체의 일부 반환
+            properties:
+              userId:
+                type: string
+                description: 유저의 고유 ID
+              introduction:
+                type: string
+                description: 자기 소개
+              email:
+                type: string
+                description: 이메일
+              area:
+                type: string
+                description: 지역
+              projectNum:
+                type: string
+                description: 진행한 프로젝트 수
+              devArray:
+                type: array
+                items: string
+                description: 개발자 스택 코드
+              desArray:
+                type: array
+                items: string
+                description: 디자인 스택 코드
+              profileImage:
+                type: object
+                properties:
+                  original:
+                    type: object
+                    description: 원본 이미지
+                    properties:
+                      fileName:
+                        type: string
+                        description: 원본 파일 명
+                      s3Location:
+                        type: string
+                        description: 원본 파일의 s3파일 로케이션, 이름을 제외한 경로가 존재한다.
+                      size:
+                        type: Int32
+                        description: 원본 파일의 사이즈
+                  resized:
+                    type: object
+                    description: 리사이즈된 이미지
+                    properties:
+                      fileName:
+                        type: string
+                        description: 리사이즈된 파일 명
+                      s3Location:
+                        type: string
+                        description: 리사이즈된 파일의 s3파일 로케이션, 이름을 제외한 경로가 존재한다.
+                      size:
+                        type: Int32
+                        description: 리사이즈된 파일의 사이즈 (미 구현)

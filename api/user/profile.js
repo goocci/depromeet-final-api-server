@@ -5,8 +5,12 @@ const utils = require('../../utils')
 const path = require('path')
 
 exports.write = (req, res) => {
-    const userId = req.body.uId || req.query.uId
-    const introduction = req.body.introduction || req.query.introduction
+    const userId = req.body.uId // User Id
+    const introduction = req.body.introduction // 자기 소개
+    const DevSkillArray = req.body.devSkill || []
+    const DesSkillArray = req.body.desSkill || []
+    const email = req.body.email || ''
+    const area = req.body.area || ''
 
     //1. QueryString 체크
     const CheckQueryString = () => {
@@ -20,7 +24,7 @@ exports.write = (req, res) => {
         })
     }
 
-    //2. User Id 존재하는지 판별 후, Introduction 수정
+    //2. User Id 존재하는지 판별 후, Introduction, SkillCode 수정
     const CheckUserExist = () => {
         return new Promise((resolve, reject) => {
             User.findOne({_id: userId}).exec((err, user)=>{
@@ -34,6 +38,10 @@ exports.write = (req, res) => {
                 else {
                     user.introduction = introduction
                     user.updatedDt = Date.now()
+                    user.skillCode.developer = DevSkillArray
+                    user.skillCode.designer = DesSkillArray
+                    user.email = email
+                    user.area = area
                     resolve(user)
                 }
             })
@@ -41,28 +49,47 @@ exports.write = (req, res) => {
     }
 
     //3. Image File Upload
-    const imageUpload = (user) =>{
-        if (req.file){
-            let fileName = path.basename(req.file.location)
-            let dirname = path.dirname(req.file.location)
-            let resizedDirname = dirname.replace('images/original', 'copy/images')
-            user.profileImage.original.fileName = fileName || ''
-            user.profileImage.original.s3Location = dirname || ''
-            user.profileImage.original.size = req.file.size || ''
-            user.profileImage.resized.fileName = fileName || ''
-            user.profileImage.resized.s3Location = resizedDirname || ''
-            user.profileImage.resized.size = req.file.size || '' // 어캐 구현 하죠..?
-        }
-        user.save((err, obj) =>{
-            if(err) throw err
-            res.status(200).json(obj)
+    const imageUpload = (user) => {
+        return new Promise((resolve, reject) => {
+            if (req.file){
+                let fileName = path.basename(req.file.location)
+                let dirname = path.dirname(req.file.location)
+                let resizedDirname = dirname.replace('images/original', 'copy/images')
+                user.profileImage.original.fileName = fileName || ''
+                user.profileImage.original.s3Location = dirname || ''
+                user.profileImage.original.size = req.file.size || ''
+                user.profileImage.resized.fileName = fileName || ''
+                user.profileImage.resized.s3Location = resizedDirname || ''
+                user.profileImage.resized.size = req.file.size || '' // 어캐 구현 하죠..?
+                user.updatedDt = Date.now()
+            }
+            user.save((err, obj) =>{
+                if(err) throw err
+            })
+            resolve(user)
         })
     }
 
+    //4. 응답
+    const response = (user) => {
+        const returnValue = {
+            userId: user.userId,
+            introduction: user.introduction,
+            email: user.email,
+            area: user.area,
+            devArray: user.skillCode.developer,
+            desArray: user.skillCode.designer,
+            profileImage: user.profileImage,
+            projectNum: user.projectNum
+        }
+
+        res.status(200).json(returnValue)
+    }
 
     CheckQueryString()
         .then(CheckUserExist)
         .then(imageUpload)
+        .then(response)
         .catch((err)=>{
             if(err){
                 res.status(500).json(err)

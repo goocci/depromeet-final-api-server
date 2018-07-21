@@ -103,7 +103,7 @@ exports.AddComment = (req, res) => {
     //3. 유저 존재하는지 체크
     const CheckExistUser = (Proj) => {
         return new Promise((resolve, reject) => {
-            User.findOne({_id : userId}).exec((err, user) => {
+            User.findOne({userId : userId}).exec((err, user) => {
                 if (!user) {
                     return reject({
                         code: 'user_error',
@@ -122,13 +122,12 @@ exports.AddComment = (req, res) => {
     const Results = (Proj) => {
         let comment = {
             commenterId: userId,
-            contents: Contents,
-            date: Date.now()
+            contents: Contents
         }
         Proj.comments.push(comment)
         Proj.save((err, object) => {
             if (err) throw err
-            res.status(200).send(comment)
+            res.status(200).send(Proj.comments)
         })
     }
 

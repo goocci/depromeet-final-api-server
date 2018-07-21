@@ -27,7 +27,9 @@ const User = new Schema({
   skillCode: { // 보유 기술코드 목록
     designer: [String], // 디자이너 기술코드 목록
     developer: [String] // 개발자 기술코드 목록
-  }
+  },
+  projectNum: String,
+  region: String
 },
 {collection: 'user'}
 )
