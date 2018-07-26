@@ -1295,11 +1295,6 @@ paths:
           description: User ID
           type: string
           required: true
-        - in: body
-          name: contents
-          description: 댓글 내용
-          type: string
-          required: true
       responses:
         '200':
           description: 요청 성공
@@ -1338,45 +1333,6 @@ paths:
               DeleteSuccess:
                 type: boolean
                 description: 삭제 성공 여부, false는 이미 존재하지 않는 지원 목록일시
-        '500':
-          description: 요청 실패
-  /project/applyList:
-    post:
-      tags:
-        - Project
-      summary: 지원 목록 반환
-      description: 지원 목록 반환
-      parameters:
-        - in: body
-          name: pId
-          description: Project ID
-          type: string
-          required: true
-        - in: body
-          name: PMId
-          description: Project Master ID
-          type: string
-          required: true
-      responses:
-        '200':
-          description: 요청 성공
-          schema:
-            type: array
-            items:
-              type: object
-              properties:
-                _id:
-                  type: string
-                  description: 요청 객체 아이디
-                userId:
-                  type: string
-                  description: 유저 아이디
-                join:
-                  type: boolean
-                  description: 지원 승인 여부
-                contents:
-                  type: string
-                  description: 지원 동기
         '500':
           description: 요청 실패
   /project/applyToggle:

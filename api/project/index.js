@@ -22,8 +22,8 @@ router.post('/addComment', comment.AddComment) // 댓글 추가
 router.post('/deleteComment', comment.DeleteComment) // 댓글 삭제
 router.post('/apply', apply.apply) // 프로젝트 지원
 router.post('/applyCancel', apply.applyCancel) // 지원 취소
-router.post('/applyList', apply.applyList) // 지원 목록
 router.post('/applyToggle', apply.applyToggle) // 지원 토글(true to false, false to true)
+router.post('/lookupSimpleProfile', lookup.LookupSimpleProflie) // 간소화된 프로필 반환
 
 router.get('/applicant/list', applicant.getApplicantList) // 지원자 목록 조회
 router.get('/participant/list', participant.getParticipantList) // 참여자 목록 조회
