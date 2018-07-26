@@ -23,7 +23,6 @@ const User = new Schema({
   },
   createdDt: {type: Date, default: Date.now}, // 생성 일시
   updatedDt: {type: Date, default: Date.now}, // 수정 일시
-  introduction: String, // 자기 소개
   skillCode: { // 보유 기술코드 목록
     design: [{ // 디자인 기술코드 목록
       code: String, // 코드
@@ -38,7 +37,7 @@ const User = new Schema({
       score: Number // 숙련도
     }]
   },
-  projectNum: String,
+  projectNum: Number, // 프로젝트 진행 수
   position: String, // 포지션
   area: String, // 지역
   contact: String // 연락처

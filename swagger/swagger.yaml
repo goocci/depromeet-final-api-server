@@ -532,9 +532,6 @@ paths:
               profileImage:
                 type: string
                 description: 프로필 이미지 URL
-              introduction:
-                type: string
-                description: 자기소개
               area:
                 type: string
                 description: 지역
