@@ -38,6 +38,7 @@ const User = new Schema({
       score: Number // 숙련도
     }]
   },
+  projectNum: String,
   position: String, // 포지션
   area: String, // 지역
   contact: String // 연락처

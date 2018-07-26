@@ -4,7 +4,8 @@ const Project = require("../../models/project")
 const User = require("../../models/user")
 
 exports.Comments = (req, res) => {
-    const projId = req.body.pId || req.query.pId
+    const projId = req.body.pId
+    const userId = req.body.uId
 
     //1. QueryString 체크
     const CheckQueryString = () => {
@@ -30,7 +31,28 @@ exports.Comments = (req, res) => {
                     })
                 }
                 else {
-                    res.status(200).json(proj.comments)
+                    let TheComments = proj.comments.map((x) => {
+                        if (!userId || !(userId == x.commenterId || userId == proj.writerId)) {
+                            return {
+                                allowDelete: false,
+                                commenterId: x.commenterId,
+                                contents: x.contents,
+                                date: x.date
+                            }
+                        }
+                        else {
+                            return {
+                                allowDelete: true,
+                                commenterId: x.commenterId,
+                                contents: x.contents,
+                                date: x.date
+                            }
+                        }
+                    })
+                    TheComments.sort((x, y)=>{
+                        return y.date - x.date
+                    })
+                    res.status(200).json(TheComments)
                 }
             })
         })
@@ -81,7 +103,7 @@ exports.AddComment = (req, res) => {
     //3. 유저 존재하는지 체크
     const CheckExistUser = (Proj) => {
         return new Promise((resolve, reject) => {
-            User.findOne({_id : userId}).exec((err, user) => {
+            User.findOne({userId : userId}).exec((err, user) => {
                 if (!user) {
                     return reject({
                         code: 'user_error',
@@ -100,13 +122,12 @@ exports.AddComment = (req, res) => {
     const Results = (Proj) => {
         let comment = {
             commenterId: userId,
-            contents: Contents,
-            date: Date.now()
+            contents: Contents
         }
         Proj.comments.push(comment)
         Proj.save((err, object) => {
             if (err) throw err
-            res.status(200).send(comment)
+            res.status(200).send(Proj.comments)
         })
     }
 
@@ -118,9 +139,9 @@ exports.AddComment = (req, res) => {
     })
 }
 exports.DeleteComment = (req, res) =>{
-    const projId = req.body.pId || req.query.pId // 프로젝트 ID
-    const commentId = req.body.cId || req.query.cId // Comment ID
-    const userId = req.body.uId || req.query.uId // User ID 혹은 PM ID
+    const projId = req.body.pId // 프로젝트 ID
+    const commentId = req.body.cId // Comment ID
+    const userId = req.body.uId // User ID 혹은 PM ID
 
     //1. QueryString 체크
     const CheckQueryString = () => {
