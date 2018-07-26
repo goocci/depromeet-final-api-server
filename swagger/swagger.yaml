@@ -603,6 +603,40 @@ paths:
                           description: 숙련도
         '500':
           description: 나의 프로필 정보 조회 실패
+  /user/myProfile/tooltip:
+    get:
+      tags:
+        - User
+      summary : 나의 프로필 정보 Tooltip 조회
+      description : 나의 프로필 정보 Tooltip 조회
+      parameters :
+        - in : query
+          name : userId
+          description : 사용자 고유 id
+          required : true
+      responses:
+        '200':
+          description : 나의 프로필 정보
+          schema:
+            type : object
+            properties :
+              userId:
+                type: string
+                description: 사용자 고유 id
+              email:
+                type: string
+                description: 이메일
+              nickName:
+                type: string
+                description: 닉네임
+              realName:
+                type: string
+                description: 실명
+              profileImage:
+                type: string
+                description: 프로필 이미지 URL
+        '500':
+          description: 나의 프로필 정보 Tooltip 조회 실패
   /project/applicant/list:
     get:
       tags:
@@ -973,7 +1007,7 @@ paths:
   /project/lookupAll:
     post:
       tags:
-        - project
+        - Project
       summary: 전체 프로젝트 페이지 별로 조회
       description: 전체 프로젝트 페이지 별로 조회
       parameters:
