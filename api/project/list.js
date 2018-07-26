@@ -2,7 +2,6 @@
 
 const Project = require('../../models/project')
 const User = require('../../models/user')
-const moment = require('moment')
 
 /**
  * [API] 메인 프로젝트 목록 조회
@@ -101,3 +100,142 @@ exports.getMainProjectList = (req, res) => {
       })
     })
   }
+
+/**
+ * [API] 내가 등록한 프로젝트 목록 조회
+ * @param {*} req
+ * @param {*} res
+ */
+exports.getMyProjectList = (req, res) => {
+  const userId = req.query.userId
+  const page = req.query.page || 1
+  const perPage = req.query.perPage || 5
+
+  // 0. 쿼리스트링 확인
+  const checkQueryString = () => {
+    return new Promise((resolve, reject) => {
+      if (!userId) {
+        return reject({
+          code: 'query_string_error',
+          message: 'query string is not defined'
+        })
+      } else resolve()
+    })
+  }
+
+  // 1. 내가 등록한 프로젝트 목록 조회
+  const getMyProject = () => {
+    return new Promise((resolve, reject) => {
+      Project
+      .find({ writerId: userId })
+      .sort('-createdDt')
+      .paginate({
+        perPage: perPage,
+        delta  : 3,
+        page   : page
+      }, (err, results) => {
+        if (err) return reject(err)
+
+        const projectArr = results.results.map((project) => {
+          return {
+            projectId: project._id,
+            title: project.title,
+            text: project.text.substring(0, 30),
+            startDate: project.startDt,
+            endDate: project.endDt,
+            hits: project.hits,
+            applicantCount: project.applicant.length
+          }
+        })
+
+        res.status(200).json({
+          projectList: projectArr,
+          currentPage: results.current,
+          lastPage: results.last || 1,
+          totalCount: results.count
+        })
+      })
+    })
+  }
+
+  checkQueryString()
+  .then(getMyProject)
+  .catch((err) => {
+    console.error(err)
+    return res.status(500).json(err.message || err)
+  })
+}
+
+/**
+ * [API] 내가 지원한 프로젝트 목록 조회
+ * @param {*} req
+ * @param {*} res
+ */
+exports.getMyApplyProjectList = (req, res) => {
+  const userId = req.query.userId
+  const page = req.query.page || 1
+  const perPage = req.query.perPage || 5
+
+  // 0. 쿼리스트링 확인
+  const checkQueryString = () => {
+    return new Promise((resolve, reject) => {
+      if (!userId) {
+        return reject({
+          code: 'query_string_error',
+          message: 'query string is not defined'
+        })
+      } else resolve()
+    })
+  }
+
+  // 1. 내가 지원한 프로젝트 목록 조회
+  const getMyApplyProject = () => {
+    return new Promise((resolve, reject) => {
+      Project
+      .find({
+        applicant: {
+          $elemMatch: {
+            userId: userId
+          }
+        }
+      })
+      .sort('-createdDt')
+      .paginate({
+        perPage: perPage,
+        delta  : 3,
+        page   : page
+      }, (err, results) => {
+        if (err) return reject(err)
+
+        const projectArr = results.results.map((project) => {
+          return {
+            projectId: project._id,
+            title: project.title,
+            text: project.text.substring(0, 30),
+            startDate: project.startDt,
+            endDate: project.endDt,
+            hits: project.hits,
+            applicantCount: project.applicant.length
+            // [TODO]
+            // 나의 참여확정된 프로젝트 목록이 따로 있다면, 이 API에서는 join:false 프로젝트 목록만
+            // 나의 참여확정된 프로젝트 목록이 따로 없다면, 이 API에서 isJoin(참여확정여부) 응답값 추가          
+          }
+        })
+
+        res.status(200).json({
+          projectList: projectArr,
+          currentPage: results.current,
+          lastPage: results.last || 1,
+          totalCount: results.count
+        })
+      })
+    })
+  }
+
+  checkQueryString()
+  .then(getMyApplyProject)
+  .catch((err) => {
+    console.error(err)
+    return res.status(500).json(err.message || err)
+  })
+}

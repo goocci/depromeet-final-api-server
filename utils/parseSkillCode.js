@@ -10,19 +10,24 @@ const _ = require('lodash')
  */
 exports.getSkillCodeName = (type, skillCodeArr) => {
   return new Promise((resolve, reject) => {
+    if (!skillCodeArr) return resolve([])
     SkillCode
     .findOne({
       codeType: type
     })
     .then((result) => {
       const skillCodeNameArr = skillCodeArr.map((skillCode) => {
+        const item = _.find(result.items, { code: skillCode.code })
         return {
-          code: skillCode,
-          codeName: _.find(result.items, { code: skillCode }).codeName
+          code: skillCode.code,
+          codeName: item.codeName,
+          image: item.image,
+          score: skillCode.score
         }
       })
   
       resolve(skillCodeNameArr)
     })
+    .catch((err) => { console.error(err) })
   })
 }
