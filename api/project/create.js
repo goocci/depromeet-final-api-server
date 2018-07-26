@@ -132,11 +132,12 @@ exports.createProject = (req, res) => {
                 frontend: frontendSkillArr,
                 backend: backendSkillArr
               },
-              projectCount: 0
+              projectCount: userInfo.projectNum || 0
             },
             isWriter: true // 프로젝트 생성자가 무조건 작성자
           }
-          resolve(response)
+          
+          res.status(200).json(response)
         } catch (err) {
           return reject(err)
         }
@@ -146,42 +147,11 @@ exports.createProject = (req, res) => {
     })
   }
 
-  // 5. 작성자 프로젝트 진행수 산출 및 응답
-  const getProjectCountAndResp = (response) => {
-    return new Promise((resolve, reject) => {
-      Project
-      .find({
-        $or: [
-          {
-            writerId: response.writerInfo.writerId
-          },
-          {
-            applicant: {
-              $elemMatch: {
-                userId: response.writerInfo.writerId,
-                join: true
-              }
-            }
-          }
-        ]
-      })
-      .count()
-      .then((projectCount) => {
-        response.writerInfo.projectCount = projectCount
-        res.status(200).json(response)
-      })
-      .catch((err) => {
-        return reject(err)
-      })
-    })
-  }
-
   checkReqBody()
   .then(checkAttachments)
   .then(createNewProject)
   .then(getWriterInfo)
   .then(setRespData)
-  .then(getProjectCountAndResp)
   .catch((err) => {
     console.error(err)
     return res.status(500).json(err.message || err)

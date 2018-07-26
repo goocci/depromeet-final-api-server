@@ -38,19 +38,9 @@ exports.getParticipantList = (req, res) => {
     return Promise.all(findMany)
   }
 
-  // 3. 프로젝트 진행수 산출
-  const getProjectCount = (applicantArr) => {
-    const applicantList = applicantArr.filter(elem => elem) // join:false 지원자 제외
-
-    const findMany = applicantList.map((applicant) => {
-      return setProjectCount(applicant)
-    })
-
-    return Promise.all(findMany)
-  }
-
   // 3. 응답
-  const resp = (applicantList) => {
+  const resp = (applicantArr) => {
+    const applicantList = applicantArr.filter(elem => elem) // join:false 지원자 제외
     res.status(200).json(applicantList)
   }
 
@@ -81,7 +71,7 @@ exports.getParticipantList = (req, res) => {
               frontend: frontendSkillArr,
               backend: backendSkillArr
             },
-            projectCount: 0
+            projectCount: userInfo.projectNum || 0
           })
         }
 
@@ -93,40 +83,9 @@ exports.getParticipantList = (req, res) => {
     })
   }
 
-  // [Func] 프로젝트 진행수 산출
-  const setProjectCount = (applicant) => {
-    return new Promise((resolve, reject) => {
-      Project
-      .find({
-        $or: [
-          {
-            writerId: applicant.userId
-          },
-          {
-            applicant: {
-              $elemMatch: {
-                userId: applicant.userId,
-                join: true
-              }
-            }
-          }
-        ]
-      })
-      .count()
-      .then((projectCount) => {
-        applicant.projectCount = projectCount
-        resolve(applicant)
-      })
-      .catch((err) => {
-        return reject(err)
-      })
-    })
-  }
-
   checkQueryString()
   .then(getProjectApplicantList)
   .then(setParticipantInfo)
-  .then(getProjectCount)
   .then(resp)
   .catch((err) => {
     console.error(err)
