@@ -1,6 +1,7 @@
 'use strict'
 
 const Message = require('../../models/message')
+const Notice = require('../../models/notice')
 
 /**
  * [API] 쪽지 보내기
@@ -36,6 +37,20 @@ exports.sendMessage = (req, res) => {
           })
   }
 
+  // 2. 받는이 알림 생성
+  const createReceiverNotice = (msgInfo) => {
+    return Notice
+          .create({
+            userId: receiverId,
+            type: 'message',
+            contents: {
+              text: '님이 귀하에게 쪽지를 보냈습니다.',
+              senderId: senderId,
+              messageId: msgInfo._id
+            }
+          })
+  }
+
   // 2. 응답
   const resp = () => {
     res.status(200).json({
@@ -46,6 +61,7 @@ exports.sendMessage = (req, res) => {
 
   checkReqBody()
   .then(saveMessage)
+  .then(createReceiverNotice)
   .then(resp)
   .catch((err) => {
     console.error(err)
