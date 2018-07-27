@@ -19,6 +19,8 @@ tags:
     description: 기술코드
   - name: Message
     description: 쪽지
+  - name: Notice
+    description: 알림
 schemes:
   - http
 paths:
@@ -1545,3 +1547,40 @@ paths:
                       size:
                         type: Int32
                         description: 리사이즈된 파일의 사이즈 (미 구현)
+  /notice/list:
+    get:
+      tags:
+        - Notice
+      summary : 나의 알림 목록 조회
+      description : 나의 알림 목록 조회
+      parameters :
+        - in : query
+          name : userId
+          description : 사용자 고유 id
+          required : true
+      responses:
+        '200':
+          description : 알림 목록
+          schema:
+            type : array
+            items:
+              type: object
+              decription: 알림 정보
+              properties:
+                noticeId:
+                  type: string
+                  descripion: 알림 고유 id
+                content:
+                  type: string
+                  descripion: 알림 내용
+                type:
+                  type: string
+                  descripion: 알림 종류 ("message" or "selected" or "apply")
+                messageId:
+                  type: string
+                  descripion: 쪽지 고유 id ("message" type인 경우에만 존재)
+                projectId:
+                  type: string
+                  descripion: 프로젝트 고유 id ("selected" or "apply" type인 경우에만 존재)
+        '500':
+          description: 나의 알림 목록 조회 실패
