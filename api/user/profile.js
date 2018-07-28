@@ -6,9 +6,11 @@ const path = require('path')
 
 exports.write = (req, res) => {
     const userId = req.body.uId // User Id
-    const introduction = req.body.introduction // 자기 소개
-    const DevSkillArray = req.body.devSkill || []
-    const DesSkillArray = req.body.desSkill || []
+    const projectNum = req.body.projectNum //
+    const position = req.body.position //
+    const UIUXSkillArray = req.body.uiuxskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
+    const FrontSkillArray = req.body.frontskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
+    const BackSkillArray = req.body.backskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
     const email = req.body.email || ''
     const area = req.body.area || ''
 
@@ -27,7 +29,7 @@ exports.write = (req, res) => {
     //2. User Id 존재하는지 판별 후, Introduction, SkillCode 수정
     const CheckUserExist = () => {
         return new Promise((resolve, reject) => {
-            User.findOne({_id: userId}).exec((err, user)=>{
+            User.findOne({userId: userId}).exec((err, user)=>{
                 if (err) throw err
                 if (!user){
                     return reject({
@@ -36,12 +38,21 @@ exports.write = (req, res) => {
                     })
                 }
                 else {
-                    user.introduction = introduction
+                    user.projectNum = projectNum
                     user.updatedDt = Date.now()
-                    user.skillCode.developer = DevSkillArray
-                    user.skillCode.designer = DesSkillArray
+                    user.position = position
                     user.email = email
                     user.area = area
+
+                    if (!UIUXSkillArray) {
+                        user.skillCode.design = JSON.parse(UIUXSkillArray)
+                    }
+                    if (!FrontSkillArray) {
+                        user.skillCode.frontend = JSON.parse(FrontSkillArray)
+                    }
+                    if (!BackSkillArray) {
+                        user.skillCode.backend = JSON.parse(BackSkillArray)
+                    }
                     resolve(user)
                 }
             })
@@ -82,7 +93,6 @@ exports.write = (req, res) => {
             profileImage: user.profileImage,
             projectNum: user.projectNum
         }
-
         res.status(200).json(returnValue)
     }
 

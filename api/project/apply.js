@@ -133,16 +133,25 @@ exports.applyCancel = (req, res) => {
                 res.status.json(err)
         })
 }
-exports.applyToggle = (req, res) => {
+const CheckArrayEqual = (arr1, arr2) => {
+    if (arr1.length != arr2.length){
+        return false
+    }
+    for (let i = 0; i < arr1.length; i++){
+        if (arr1[i] != arr2[i])
+            return false
+    }
+    return true
+}
+exports.applyAccept = (req, res) => {
     const projectId = req.body.pId
     const PMId = req.body.PMId
-    const userId = req.body.uId
-    const check = req.body.check
+    const userArray = req.body.userArray // User의 참가 여부가 들어가 있는 JSON 배열
 
     //1. QueryString 체크
     const CheckQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!projectId || !userId || !PMId || !check) {
+            if (!projectId || !userArray || !PMId) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -168,8 +177,8 @@ exports.applyToggle = (req, res) => {
                     }
                     else {
                         return reject({ // PMID와 프로젝트의 PmId가 안겹칠때
-                            code: 'not_match',
-                            message: 'This Id does not match'
+                            code: 'PMID_not_match',
+                            message: 'PMId does not match'
                         })
                     }
                 }
@@ -177,33 +186,24 @@ exports.applyToggle = (req, res) => {
         })
     }
 
-    //3. User ID 존재 여부, 있으면
+    //3. User Array 일치 여부
     const CheckUserID = (proj) => {
         return new Promise((resolve, reject) => {
-            let index = proj.applicant.findIndex(x => x.userId)
+            let arr1 = proj.applicant.keys().sort()
+            let arr2 = JSON.parse(userArray).keys().sort()
 
-            if (index == -1){
-                return reject({
-                    code: 'user_doesn\'t_exist',
-                    message: 'user doesn\'t exist'
+            if (CheckArrayEqual(arr1, arr2)) {
+                proj.applicant = JSON.parse(userArray)
+                proj.save((err) => {
+                    if (err)
+                        throw err
                 })
-            } else {
-                if (check){
-                    proj.applicant[index].join = true
-                    proj.save((err)=>{
-                        if (err) throw err
-                        else
-                            res.status(200).json({join : true}) // true to false,
-                    })
-                }
-                else {
-                    proj.applicant[index].join = false
-                    proj.save((err)=>{
-                        if (err) throw err
-                        else
-                            res.status(200).json({join : false}) // false to true
-                    })
-                }
+            }
+            else {
+                return reject({
+                    code: 'userArray_not_match',
+                    message : 'userArray does not match'
+                })
             }
         })
     }
