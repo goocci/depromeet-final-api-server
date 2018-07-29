@@ -150,7 +150,7 @@ exports.getMyProfile = (req, res) => {
     let userInfo = data.userInfo
     res.status(200).json({
       userId: userInfo.userId,
-      email: userInfo.email,
+      email: userInfo.email || '',
       nickName: userInfo.nickName,
       realName: userInfo.realName || '', 
       snsType: userInfo.snsType,
@@ -162,7 +162,8 @@ exports.getMyProfile = (req, res) => {
       },
       area: userInfo.area || '',
       position: userInfo.position || '',
-      contact: userInfo.contact || ''
+      contact: userInfo.contact || '',
+      projectCount: userInfo.projectNum || 0
     })
   }
 
@@ -205,7 +206,7 @@ exports.getMyProfileTooltip = (req, res) => {
   const respUserInfo = (userInfo) => {
     res.status(200).json({
       userId: userInfo.userId,
-      email: userInfo.email,
+      email: userInfo.email || '',
       nickName: userInfo.nickName,
       realName: userInfo.realName || '', 
       profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png'
