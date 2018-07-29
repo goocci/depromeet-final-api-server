@@ -16,7 +16,7 @@ exports.socialLogin = (req, res) => {
   // 0. 요청 바디 확인
   const checkReqBody = () => {
     return new Promise((resolve, reject) => {
-      if (!userId || !email || !snsType || !nickName) {
+      if (!userId || !snsType || !nickName) {
         return reject({
           code: 'request_body_error',
           message: 'request body is not defined'
@@ -42,7 +42,7 @@ exports.socialLogin = (req, res) => {
   const respUserInfo = (userInfo) => {
     res.status(200).json({
       userId: userInfo.userId,
-      email: userInfo.email,
+      email: userInfo.email || '',
       nickName: userInfo.nickName,
       realName: userInfo.realName || '',
       snsType: userInfo.snsType,
