@@ -101,11 +101,14 @@ const getUserSimpleProfile = (userId) => {
             else {
                 return {
                     nickName: obj.nickName,
+                    realName: obj.realName,
                     resizedProfileImage: obj.profileImage.resized,
                     area: obj.area,
                     projectNum: obj.projectNum,
                     position: obj.position,
-                    skillCode: obj.skillCode,
+                    backendSkill: obj.skillCode.backend,
+                    frontendSkill: obj.skillCode.frontend,
+                    designSkill: obj.skillCode.design,
                     email: obj.email
                 }
             }
@@ -142,9 +145,12 @@ exports.lookupDetail = (req, res) => {
             }
             else {
                 res.status(200).json({
-                    user: getUserSimpleProfile(proj.writerId),
+                    writerId: proj.writerId,
+                    userObj: getUserSimpleProfile(proj.writerId),
                     title: proj.title,
                     text: proj.text,
+                    startDt: proj.startDt,
+                    endDt: proj.endDt,
                     positionNeed: proj.positionNeed,
                     attachments: proj.attachments
                 })
@@ -158,39 +164,4 @@ exports.lookupDetail = (req, res) => {
             if (err) throw err
             res.status(500).send(err)
     })
-}
-exports.LookupSimpleProflie = (req, res) => {
-    const userId = req.body.uId
-
-    const SendUserSimpleProfile = (userId) => {
-        return new Promise((resolve, reject) => {
-            User.findOne({userId: userId}).exec((err, obj) => {
-                if (err) throw err;
-
-                if (!obj){
-                    return reject({
-                        code: 'user_does_not_exist',
-                        message: 'User does not exist'
-                    })
-                }
-                else {
-                    res.status(200).send({
-                        nickName: obj.nickName,
-                        resizedProfileImage: obj.profileImage.resized,
-                        area: obj.area,
-                        projectNum: obj.projectNum,
-                        position: obj.position,
-                        skillCode: obj.skillCode,
-                        email: obj.email
-                    })
-                }
-            })
-        })
-    }
-
-    SendUserSimpleProfile(userId)
-        .catch((err) => {
-            if (err)
-                req.status(500).send(err)
-        })
 }

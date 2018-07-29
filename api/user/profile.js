@@ -4,13 +4,17 @@ const User = require("../../models/user")
 const utils = require('../../utils')
 const path = require('path')
 
+const SkillCodeArrayParse = (arrayString) = {
+
+}
+
 exports.write = (req, res) => {
     const userId = req.body.uId // User Id
     const projectNum = req.body.projectNum //
     const position = req.body.position //
-    const UIUXSkillArray = req.body.uiuxskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
-    const FrontSkillArray = req.body.frontskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
-    const BackSkillArray = req.body.backskillarray || [] // Json의 배열로 기술명, 숙련도 배열 받음
+    const UIUXSkillArray = req.body.uiuxskillarray // Json의 배열로 기술명, 숙련도 배열 받음
+    const FrontSkillArray = req.body.frontskillarray // Json의 배열로 기술명, 숙련도 배열 받음
+    const BackSkillArray = req.body.backskillarray // Json의 배열로 기술명, 숙련도 배열 받음
     const email = req.body.email || ''
     const area = req.body.area || ''
 
@@ -63,14 +67,14 @@ exports.write = (req, res) => {
     const imageUpload = (user) => {
         return new Promise((resolve, reject) => {
             if (req.file){
-                let fileName = path.basename(req.file.location)
+                let fileName = path.basename(req.file.location).slice(path.basename.indexOf('_')+1)
                 let dirname = path.dirname(req.file.location)
-                let resizedDirname = dirname.replace('images/original', 'copy/images')
+                let resizedDirname = path.dirname.replace('images/original', 'copy/images')
                 user.profileImage.original.fileName = fileName || ''
-                user.profileImage.original.s3Location = dirname || ''
+                user.profileImage.original.s3Location = req.file.location || ''
                 user.profileImage.original.size = req.file.size || ''
                 user.profileImage.resized.fileName = fileName || ''
-                user.profileImage.resized.s3Location = resizedDirname || ''
+                user.profileImage.resized.s3Location = req.file.location || ''
                 user.profileImage.resized.size = req.file.size || '' // 어캐 구현 하죠..?
                 user.updatedDt = Date.now()
             }
@@ -85,11 +89,12 @@ exports.write = (req, res) => {
     const response = (user) => {
         const returnValue = {
             userId: user.userId,
-            introduction: user.introduction,
+            position: user.position,
             email: user.email,
             area: user.area,
-            devArray: user.skillCode.developer,
-            desArray: user.skillCode.designer,
+            backendSkill: user.skillCode.backend,
+            frontendSkill: user.skillCode.frontend,
+            designSkill: user.skillCode.design,
             profileImage: user.profileImage,
             projectNum: user.projectNum
         }
@@ -230,4 +235,42 @@ exports.getMyProfileTooltip = (req, res) => {
     console.error(err)
     return res.status(500).json(err.message || err)
   })
+}
+exports.LookupSimpleProflie = (req, res) => {
+    const userId = req.body.uId
+
+    const SendUserSimpleProfile = (userId) => {
+        return new Promise((resolve, reject) => {
+            User.findOne({userId: userId}).exec((err, obj) => {
+                if (err) throw err;
+
+                if (!obj){
+                    return reject({
+                        code: 'user_does_not_exist',
+                        message: 'User does not exist'
+                    })
+                }
+                else {
+                    res.status(200).send({
+                        nickName: obj.nickName,
+                        realName: obj.realName,
+                        resizedProfileImage: obj.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+                        area: obj.area,
+                        projectNum: obj.projectNum,
+                        position: obj.position,
+                        backendSkill: obj.skillCode.backend,
+                        frontendSkill: obj.skillCode.frontend,
+                        designSkill: obj.skillCode.design,
+                        email: obj.email
+                    })
+                }
+            })
+        })
+    }
+
+    SendUserSimpleProfile(userId)
+        .catch((err) => {
+            if (err)
+                req.status(500).send(err)
+        })
 }

@@ -23,7 +23,6 @@ router.post('/deleteComment', comment.DeleteComment) // 댓글 삭제
 router.post('/apply', apply.apply) // 프로젝트 지원
 router.post('/applyCancel', apply.applyCancel) // 지원 취소
 router.post('/applyAccept', apply.applyAccept) // 지원 허가
-router.post('/lookupSimpleProfile', lookup.LookupSimpleProflie) // 간소화된 프로필 반환
 
 router.get('/applicant/list', applicant.getApplicantList) // 지원자 목록 조회
 router.get('/participant/list', participant.getParticipantList) // 참여자 목록 조회
