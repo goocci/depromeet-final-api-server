@@ -186,18 +186,19 @@ exports.applyAccept = (req, res) => {
         })
     }
 
-    //3. User Array 일치 여부
+    //3. User Array UserId 일치 여부
     const CheckUserID = (proj) => {
         return new Promise((resolve, reject) => {
-            let arr1 = proj.applicant.keys().sort()
-            let arr2 = JSON.parse(userArray).keys().sort()
+            let arr1 = proj.applicant.map((x) => {return x.userId}).sort()
+            let arr2 = JSON.parse(userArray).map((x) => {return x.userId}).sort()
 
             if (CheckArrayEqual(arr1, arr2)) {
                 proj.applicant = JSON.parse(userArray)
-                proj.save((err) => {
+                proj.save((err, obj) => {
                     if (err)
                         throw err
                 })
+                res.status(200).json(proj.applicant)
             }
             else {
                 return reject({

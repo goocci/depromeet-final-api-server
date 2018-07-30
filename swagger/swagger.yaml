@@ -1025,9 +1025,9 @@ paths:
         '200':
           description : 반환 성공
           schema:
-            type: Array
+            type: array
             items:
-              type: Object
+              type: object
               properties:
                 projectId:
                   type: string
@@ -1158,6 +1158,19 @@ paths:
                   email:
                     type: string
                     description: 이메일
+              positionNeed:
+                type: array
+                description: 필요한 포지션의 배열
+                items:
+                  type: object
+                  description: 필요한 포지션 객체
+                  properties:
+                    name:
+                      type: string
+                      description: 필요한 포지션
+                    image:
+                      type: string
+                      description: 이미지 경로
               title:
                 type: string
                 description: 프로젝트 제목
@@ -1201,10 +1214,10 @@ paths:
                       type: string
                       description: 지원 메세지
               createdDt:
-                type: Date
+                type: string
                 description: 생성 일자
               updatedDt:
-                type: Date
+                type: string
                 description: 업데이트 일자
               comments:
                 type: array
@@ -1219,7 +1232,7 @@ paths:
                       type: string
                       description: 댓글 내용
                     date:
-                      type: Date
+                      type: string
                       description: 댓글 작성 일시
         '500':
           description: 요청 실패
@@ -1259,7 +1272,7 @@ paths:
                   type: string
                   description: 댓글 내용
                 date:
-                  type: date
+                  type: string
                   description: 댓글 작성 일자
   /project/addComment:
     post:
@@ -1299,7 +1312,7 @@ paths:
                   type: string
                   description: 댓글 내용
                 date:
-                  type: date
+                  type: string
                   description: 댓글 작성 일자
         '500':
           description: 요청 실패
@@ -1323,6 +1336,8 @@ paths:
         - in: body
           name: uId
           description: User ID 혹은 PM ID
+          type: string
+          required: true
       responses:
         '200':
           description: 삭제 성공
@@ -1360,6 +1375,7 @@ paths:
           schema:
             type: object
             description: 지원 성공 여부가 담긴 객체
+            properties:
               applySuccess:
                 type: boolean
                 description: 지원 성공 여부, false는 중복 지원 시 반환
@@ -1399,7 +1415,7 @@ paths:
       tags:
         - Project
       summary: 지원 허가
-      description: 지원 허가
+      description: userArray와 PMID, Project ID를 받아 지원 허가 여부를 수정한다.
       parameters:
         - in: body
           name: userArray
@@ -1420,12 +1436,18 @@ paths:
         '200':
           description: 요청 성공
           schema:
-            type: object
-            description: 승인 여부에 대한 정보가 담겨있는 객체
-            properties:
-              join:
-                type: boolean
-                description: true일시, false가 true로 변한 것, false일시, false가 true로 변한 것
+            type: array
+            description: apply 정보 배열
+            items:
+              type: object
+              description: 유저 apply 정보
+              properties:
+                userId:
+                  type: string
+                  description: 유저 아이디
+                join:
+                  type: boolean
+                  description: 지원 승인 여부
         '500':
           description: 요청 실패
   /user/profileWrite:
@@ -1452,19 +1474,19 @@ paths:
           required: true
         - in: body
           name: uiuxskillarray
-          description: 디자인 스택 배열, string으로 변환된 JSON 객체를 필요로 한다.
+          description: 디자인 스택 배열, string으로 변환된 JSON 객체를 필요로 한다. ex) [{"code":"DESIGN_SKILL_CODE_1", "score":3}], 입력을 하지 않을시 정보는 변하지 않는다.
           type: string
-          required: true
+          required: false
         - in: body
           name: frontskillarray
-          description: 프론트앤드 스택 배열, string으로 변환된 JSON 객체를 필요로 한다.
+          description: 프론트앤드 스택 배열, string으로 변환된 JSON 객체를 필요로 한다. ex) [{"code":"FRONTENDD_SKILL_CODE_1", "score":3}], 입력을 하지 않을시 정보는 변하지 않는다.
           type: string
-          required: true
+          required: false
         - in: body
           name: backskillarray
-          description: 백앤드 스택 배열, string으로 변환된 JSON 객체를 필요로 한다.
+          description: 백앤드 스택 배열, string으로 변환된 JSON 객체를 필요로 한다. ex) [{"code":"BACKEND_SKILL_CODE_1", "score":3}], 입력을 하지 않을시 정보는 변하지 않는다.
           type: string
-          required: true
+          required: false
         - in: body
           name: email
           description: 이메일
@@ -1581,64 +1603,65 @@ paths:
         '200':
           description: 요청 성공
           schema:
-            nickname:
-              type: string
-              description: 별명
-            realname:
-              type: string
-              description: 실명
-            resizedProfileImage:
-              type: string
-              description: 리사이징 된 프로필 이미지 경로
-            area:
-              type: string
-              description: 지역
-            projectNum:
-              type: string
-              description: 프로젝트 수
-            position:
-              type: string
-              description: 위치
-            backendSkill:
-              type: array
-              description: 백앤드 기술 스택 배열
-              items:
-                type: object
-                description: 기술 스택의 코드와 숙련도
-                properties:
-                  code:
-                    type: string
-                    description: 기술 코드
-                  score:
-                    type: number
-                    description: 숙련도
-            frontendSkill:
-              type: array
-              description: 프론트앤드 기술 스택 배열
-              items:
-                type: object
-                description: 기술 스택의 코드와 숙련도
-                properties:
-                  code:
-                    type: string
-                    description: 기술 코드
-                  score:
-                    type: number
-                    description: 숙련도
-            designSkill:
-              type: array
-              description: 디자인 기술 스택 배열
-              items:
-                type: object
-                description: 기술 스택의 코드와 숙련도
-                properties:
-                  code:
-                    type: string
-                    description: 기술 코드
-                  score:
-                    type: number
-                    description: 숙련도
-            email:
-              type: string
-              description: 이메일
-
+            type: object
+            properties:
+              nickname:
+                type: string
+                description: 별명
+              realname:
+                type: string
+                description: 실명
+              resizedProfileImage:
+                type: string
+                description: 리사이징 된 프로필 이미지 경로
+              area:
+                type: string
+                description: 지역
+              projectNum:
+                type: string
+                description: 프로젝트 수
+              position:
+                type: string
+                description: 위치
+              backendSkill:
+                type: array
+                description: 백앤드 기술 스택 배열
+                items:
+                  type: object
+                  description: 기술 스택의 코드와 숙련도
+                  properties:
+                    code:
+                      type: string
+                      description: 기술 코드
+                    score:
+                      type: number
+                      description: 숙련도
+              frontendSkill:
+                type: array
+                description: 프론트앤드 기술 스택 배열
+                items:
+                  type: object
+                  description: 기술 스택의 코드와 숙련도
+                  properties:
+                    code:
+                      type: string
+                      description: 기술 코드
+                    score:
+                      type: number
+                      description: 숙련도
+              designSkill:
+                type: array
+                description: 디자인 기술 스택 배열
+                items:
+                  type: object
+                  description: 기술 스택의 코드와 숙련도
+                  properties:
+                    code:
+                      type: string
+                      description: 기술 코드
+                    score:
+                      type: number
+                      description: 숙련도
+              email:
+                type: string
+                description: 이메일

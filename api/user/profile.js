@@ -4,10 +4,6 @@ const User = require("../../models/user")
 const utils = require('../../utils')
 const path = require('path')
 
-const SkillCodeArrayParse = (arrayString) = {
-
-}
-
 exports.write = (req, res) => {
     const userId = req.body.uId // User Id
     const projectNum = req.body.projectNum //
@@ -21,7 +17,7 @@ exports.write = (req, res) => {
     //1. QueryString 체크
     const CheckQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!userId || !introduction) {
+            if (!userId) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -48,14 +44,38 @@ exports.write = (req, res) => {
                     user.email = email
                     user.area = area
 
-                    if (!UIUXSkillArray) {
-                        user.skillCode.design = JSON.parse(UIUXSkillArray)
+                    if (UIUXSkillArray !== undefined) {
+                        try {
+                            let newArray = JSON.parse(UIUXSkillArray)
+                            user.skillCode.design = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
                     }
-                    if (!FrontSkillArray) {
-                        user.skillCode.frontend = JSON.parse(FrontSkillArray)
+                    if (FrontSkillArray !== undefined) {
+                        try {
+                            let newArray = JSON.parse(FrontSkillArray)
+                            user.skillCode.frontend = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
                     }
-                    if (!BackSkillArray) {
-                        user.skillCode.backend = JSON.parse(BackSkillArray)
+                    if (BackSkillArray  !== undefined) {
+                        try {
+                            let newArray = JSON.parse(BackSkillArray)
+                            user.skillCode.backend = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
                     }
                     resolve(user)
                 }
@@ -67,7 +87,7 @@ exports.write = (req, res) => {
     const imageUpload = (user) => {
         return new Promise((resolve, reject) => {
             if (req.file){
-                let fileName = path.basename(req.file.location).slice(path.basename.indexOf('_')+1)
+                let fileName = path.basename(req.file.location).slice(path.basename.indexOf('_') + 1)
                 let dirname = path.dirname(req.file.location)
                 let resizedDirname = path.dirname.replace('images/original', 'copy/images')
                 user.profileImage.original.fileName = fileName || ''
@@ -258,9 +278,24 @@ exports.LookupSimpleProflie = (req, res) => {
                         area: obj.area,
                         projectNum: obj.projectNum,
                         position: obj.position,
-                        backendSkill: obj.skillCode.backend,
-                        frontendSkill: obj.skillCode.frontend,
-                        designSkill: obj.skillCode.design,
+                        backendSkill: obj.skillCode.backend.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
+                        frontendSkill: obj.skillCode.frontend.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
+                        designSkill: obj.skillCode.design.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
                         email: obj.email
                     })
                 }
