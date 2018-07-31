@@ -1,6 +1,7 @@
 'use strict'
 
 const Project = require("../../models/project")
+const User = require("../../models/user")
 const moment = require("moment")
 
 exports.lookupAllProject = (req, res) => {
@@ -86,6 +87,35 @@ const setWriterInfo = (projectInfo) => {
     })
 }
 
+const getUserSimpleProfile = (userId) => {
+    return new Promise((resolve, reject) => {
+        User.findOne({userId: userId}).exec((err, obj) => {
+            if (err) throw err;
+
+            if (!obj){
+                return reject({
+                    code: 'user_does_not_exist',
+                    message: 'User does not exist'
+                })
+            }
+            else {
+                return {
+                    nickName: obj.nickName,
+                    realName: obj.realName,
+                    resizedProfileImage: obj.profileImage.resized,
+                    area: obj.area,
+                    projectNum: obj.projectNum,
+                    position: obj.position,
+                    backendSkill: obj.skillCode.backend,
+                    frontendSkill: obj.skillCode.frontend,
+                    designSkill: obj.skillCode.design,
+                    email: obj.email
+                }
+            }
+        })
+    })
+}
+
 exports.lookupDetail = (req, res) => {
     //0. Project id 입력받음
     const pId = req.query.id
@@ -102,16 +132,28 @@ exports.lookupDetail = (req, res) => {
         })
     }
 
-    //1. Project 존재 유무 판별
+    //2. Project 존재 유무 판별
     const ProjectInfo = () => {
         Project.findOne({_id: pId}).exec((err, proj) => {
             if (err) throw err
 
             if (!proj){
-                res.status(200).json({})
+                return reject({
+                    code: 'project_does_not_exist',
+                    message: 'project does_not_exist'
+                })
             }
             else {
-                res.status(200).json(proj)
+                res.status(200).json({
+                    writerId: proj.writerId,
+                    userObj: getUserSimpleProfile(proj.writerId),
+                    title: proj.title,
+                    text: proj.text,
+                    startDt: proj.startDt,
+                    endDt: proj.endDt,
+                    positionNeed: proj.positionNeed,
+                    attachments: proj.attachments
+                })
             }
         })
 

@@ -6,16 +6,18 @@ const path = require('path')
 
 exports.write = (req, res) => {
     const userId = req.body.uId // User Id
-    const introduction = req.body.introduction // 자기 소개
-    const DevSkillArray = req.body.devSkill || []
-    const DesSkillArray = req.body.desSkill || []
+    const projectNum = req.body.projectNum //
+    const position = req.body.position //
+    const UIUXSkillArray = req.body.uiuxskillarray // Json의 배열로 기술명, 숙련도 배열 받음
+    const FrontSkillArray = req.body.frontskillarray // Json의 배열로 기술명, 숙련도 배열 받음
+    const BackSkillArray = req.body.backskillarray // Json의 배열로 기술명, 숙련도 배열 받음
     const email = req.body.email || ''
     const area = req.body.area || ''
 
     //1. QueryString 체크
     const CheckQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!userId || !introduction) {
+            if (!userId) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -27,7 +29,7 @@ exports.write = (req, res) => {
     //2. User Id 존재하는지 판별 후, Introduction, SkillCode 수정
     const CheckUserExist = () => {
         return new Promise((resolve, reject) => {
-            User.findOne({_id: userId}).exec((err, user)=>{
+            User.findOne({userId: userId}).exec((err, user)=>{
                 if (err) throw err
                 if (!user){
                     return reject({
@@ -36,12 +38,45 @@ exports.write = (req, res) => {
                     })
                 }
                 else {
-                    user.introduction = introduction
+                    user.projectNum = projectNum
                     user.updatedDt = Date.now()
-                    user.skillCode.developer = DevSkillArray
-                    user.skillCode.designer = DesSkillArray
+                    user.position = position
                     user.email = email
                     user.area = area
+
+                    if (UIUXSkillArray !== undefined) {
+                        try {
+                            let newArray = JSON.parse(UIUXSkillArray)
+                            user.skillCode.design = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
+                    }
+                    if (FrontSkillArray !== undefined) {
+                        try {
+                            let newArray = JSON.parse(FrontSkillArray)
+                            user.skillCode.frontend = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
+                    }
+                    if (BackSkillArray  !== undefined) {
+                        try {
+                            let newArray = JSON.parse(BackSkillArray)
+                            user.skillCode.backend = newArray
+                        } catch(e) {
+                            return reject({
+                                code: 'array_string_error',
+                                message: 'array string is not appropriate'
+                            })
+                        }
+                    }
                     resolve(user)
                 }
             })
@@ -52,14 +87,14 @@ exports.write = (req, res) => {
     const imageUpload = (user) => {
         return new Promise((resolve, reject) => {
             if (req.file){
-                let fileName = path.basename(req.file.location)
+                let fileName = path.basename(req.file.location).slice(path.basename.indexOf('_') + 1)
                 let dirname = path.dirname(req.file.location)
-                let resizedDirname = dirname.replace('images/original', 'copy/images')
+                let resizedDirname = path.dirname.replace('images/original', 'copy/images')
                 user.profileImage.original.fileName = fileName || ''
-                user.profileImage.original.s3Location = dirname || ''
+                user.profileImage.original.s3Location = req.file.location || ''
                 user.profileImage.original.size = req.file.size || ''
                 user.profileImage.resized.fileName = fileName || ''
-                user.profileImage.resized.s3Location = resizedDirname || ''
+                user.profileImage.resized.s3Location = req.file.location || ''
                 user.profileImage.resized.size = req.file.size || '' // 어캐 구현 하죠..?
                 user.updatedDt = Date.now()
             }
@@ -74,15 +109,15 @@ exports.write = (req, res) => {
     const response = (user) => {
         const returnValue = {
             userId: user.userId,
-            introduction: user.introduction,
+            position: user.position,
             email: user.email,
             area: user.area,
-            devArray: user.skillCode.developer,
-            desArray: user.skillCode.designer,
+            backendSkill: user.skillCode.backend,
+            frontendSkill: user.skillCode.frontend,
+            designSkill: user.skillCode.design,
             profileImage: user.profileImage,
             projectNum: user.projectNum
         }
-
         res.status(200).json(returnValue)
     }
 
@@ -220,4 +255,57 @@ exports.getMyProfileTooltip = (req, res) => {
     console.error(err)
     return res.status(500).json(err.message || err)
   })
+}
+exports.LookupSimpleProflie = (req, res) => {
+    const userId = req.body.uId
+
+    const SendUserSimpleProfile = (userId) => {
+        return new Promise((resolve, reject) => {
+            User.findOne({userId: userId}).exec((err, obj) => {
+                if (err) throw err;
+
+                if (!obj){
+                    return reject({
+                        code: 'user_does_not_exist',
+                        message: 'User does not exist'
+                    })
+                }
+                else {
+                    res.status(200).send({
+                        nickName: obj.nickName,
+                        realName: obj.realName,
+                        resizedProfileImage: obj.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+                        area: obj.area,
+                        projectNum: obj.projectNum,
+                        position: obj.position,
+                        backendSkill: obj.skillCode.backend.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
+                        frontendSkill: obj.skillCode.frontend.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
+                        designSkill: obj.skillCode.design.map((x) => {
+                            return {
+                                code: x.code,
+                                score: x.score
+                            }
+                        }),
+                        email: obj.email
+                    })
+                }
+            })
+        })
+    }
+
+    SendUserSimpleProfile(userId)
+        .catch((err) => {
+            if (err)
+                req.status(500).send(err)
+        })
 }

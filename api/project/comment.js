@@ -66,9 +66,9 @@ exports.Comments = (req, res) => {
         })
 }
 exports.AddComment = (req, res) => {
-    const projId = req.body.pId || req.query.pId // 프로젝트 ID
-    const userId = req.body.uId || req.query.uId // User ID
-    const Contents = req.body.contents || req.query.contents// 내용
+    const projId = req.body.pId // 프로젝트 ID
+    const userId = req.body.uId // User ID
+    const Contents = req.body.contents // 내용
 
     //1. QueryString 체크
     const CheckQueryString = () => {
@@ -111,7 +111,7 @@ exports.AddComment = (req, res) => {
                     })
                 }
                 else {
-                    resolve(Proj)
+                    resolve(Proj, user)
                 }
             })
         })
@@ -119,15 +119,15 @@ exports.AddComment = (req, res) => {
 
 
     //4. 최종 결과 반환
-    const Results = (Proj) => {
+    const Results = (Proj, user) => {
         let comment = {
             commenterId: userId,
-            contents: Contents
+            contents: Contents,
         }
         Proj.comments.push(comment)
         Proj.save((err, object) => {
             if (err) throw err
-            res.status(200).send(Proj.comments)
+            res.status(200).send(Proj.comments) // 이건 놔두고 LookupDetail로 조회를 하는게 좋을 듯 하다.
         })
     }
 
