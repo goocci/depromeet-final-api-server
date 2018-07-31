@@ -63,6 +63,9 @@ exports.apply = (req, res) => {
             })
         })
     }
+
+    // [TODO] 프로젝트 생성자(PM)에게 apply 알림 생성
+
     CheckQueryString()
         .then(CheckApplied)
         .catch((err)=>{
@@ -208,6 +211,9 @@ exports.applyAccept = (req, res) => {
             }
         })
     }
+
+    // [TODO] 선정된 사용자들에게 selected 알림 생성
+
     CheckQueryString()
         .then(CheckExistProject)
         .then(CheckUserID)
