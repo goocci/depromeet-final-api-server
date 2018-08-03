@@ -25,7 +25,7 @@ exports.getNoticeList = (req, res) => {
 
   // 1. 알림 목록 조회
   const getMyNoticeList = () => {
-    return Notice.find({ userId: userId }).sort('-createdDt')
+    return Notice.find({ userId: userId, isCheck: false }).sort('-createdDt')
   }
 
   // 2. 알림 종류별 내용 셋팅

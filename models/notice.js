@@ -15,10 +15,10 @@ const Notice = new Schema({
     senderId: String, // 보낸이 고유 id --> "message"
     messageId: String, // 쪽지 고유 id --> "message"
     projectId: String, // 프로젝트 고유 id --> "selected" or "apply"
-    applicantId: String, // 지원자 고유 id --> "apply"
+    applicantId: String // 지원자 고유 id --> "apply"
   },
   createdDt: {type: Date, default: Date.now}, // 생성 일시
-  updatedDt: {type: Date, default: Date.now}, // 수정 일시
+  updatedDt: {type: Date, default: Date.now} // 수정 일시
 },
 {collection: 'notice'}
 )
