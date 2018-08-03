@@ -6,8 +6,8 @@ const moment = require("moment")
 
 exports.lookupAllProject = (req, res) => {
     //0. Page 수 확인
-    const pageNum = Number(req.query.page)
-    const returnNum = Number(req.query.num) // 반환하는 프로젝트 수
+    const pageNum = Number(req.body.page)
+    const returnNum = Number(req.body.num) // 반환하는 프로젝트 수
 
     let pagingInfo = {}
 
@@ -51,12 +51,32 @@ exports.lookupAllProject = (req, res) => {
 
     //3. postList 반환
     const resp = (postList) => {
-        const newPostList = postList.map((project)=>{
-            return setWriterInfo(project)
-        })
+        let newPostList = postList.map((project)=> {
+            User.findOne({userId: project.writerId}).exec((err, obj) =>{
+                if (err) throw err
 
+                if (!obj){
+                    project.writerInfo = {}
+                }
+                if (Object(obj).hasOwnProperty('profileImage')){
+                    project.writerInfo = {
+                        profileImage: obj.profileImage.resized.s3Location,
+                        nickName: obj.nickName || ''
+                    }
+                }
+                else {
+                    project.writerInfo = {
+                        profileImage: 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+                        nickName: obj.nickName || ''
+                    }
+                }
+                return project
+            })
+        })
         res.status(200).json(newPostList)
-    }
+        }
+
+
 
 
     checkQueryString()
@@ -68,62 +88,15 @@ exports.lookupAllProject = (req, res) => {
         })
 }
 
-const setWriterInfo = (projectInfo) => {
-    return new Promise((resolve, reject) => {
-        User.findOne({
-            userId: projectInfo.writerId
-        })
-            .then((userInfo) => {
-                projectInfo.writerInfo = {
-                    profileImage: userInfo.profileImage.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
-                    nickName: userInfo.nickName
-                }
-
-                resolve(projectInfo)
-            })
-            .catch((err) => {
-                return reject(err)
-            })
-    })
-}
-
-const getUserSimpleProfile = (userId) => {
-    return new Promise((resolve, reject) => {
-        User.findOne({userId: userId}).exec((err, obj) => {
-            if (err) throw err;
-
-            if (!obj){
-                return reject({
-                    code: 'user_does_not_exist',
-                    message: 'User does not exist'
-                })
-            }
-            else {
-                return {
-                    nickName: obj.nickName,
-                    realName: obj.realName,
-                    resizedProfileImage: obj.profileImage.resized,
-                    area: obj.area,
-                    projectNum: obj.projectNum,
-                    position: obj.position,
-                    backendSkill: obj.skillCode.backend,
-                    frontendSkill: obj.skillCode.frontend,
-                    designSkill: obj.skillCode.design,
-                    email: obj.email
-                }
-            }
-        })
-    })
-}
 
 exports.lookupDetail = (req, res) => {
     //0. Project id 입력받음
-    const pId = req.query.id
+    const pId = req.body.id
 
     //1. QueryString 체크
     const checkQueryString = () => {
         return new Promise((resolve, reject) => {
-            if (!pId) {
+            if (!pId || pId == undefined) {
                 return reject({
                     code: 'query_string_error',
                     message: 'query string is not defined'
@@ -134,34 +107,61 @@ exports.lookupDetail = (req, res) => {
 
     //2. Project 존재 유무 판별
     const ProjectInfo = () => {
-        Project.findOne({_id: pId}).exec((err, proj) => {
-            if (err) throw err
+        return new Promise((resolve, reject) => {
+            Project.findOne({_id: pId}).exec((err, proj) => {
+                if (err) throw err
 
-            if (!proj){
-                return reject({
-                    code: 'project_does_not_exist',
-                    message: 'project does_not_exist'
-                })
-            }
-            else {
-                res.status(200).json({
-                    writerId: proj.writerId,
-                    userObj: getUserSimpleProfile(proj.writerId),
-                    title: proj.title,
-                    text: proj.text,
-                    startDt: proj.startDt,
-                    endDt: proj.endDt,
-                    positionNeed: proj.positionNeed,
-                    attachments: proj.attachments
-                })
-            }
+                if (!proj) {
+                    return reject({
+                        code: 'project_does_not_exist',
+                        message: 'project does_not_exist'
+                    })
+                }
+                else {
+                    let user_obj = {}
+                    User.findOne({userId: proj.writerId}).exec((err, obj) => {
+                        if (err) throw err;
+
+                        if (!obj) {
+                            return reject({
+                                code: 'user_does_not_exist',
+                                message: 'User does not exist'
+                            })
+                        }
+                        else {
+                            user_obj = {
+                                nickName: obj.nickName || '',
+                                realName: obj.realName || '',
+                                resizedProfileImage: obj.profileImage.resized || [],
+                                area: obj.area || '',
+                                projectNum: obj.projectNum || '',
+                                position: obj.position || '',
+                                backendSkill: obj.skillCode.backend || [],
+                                frontendSkill: obj.skillCode.frontend || [],
+                                designSkill: obj.skillCode.design || [],
+                                email: obj.email || ''
+                            }
+                            let json_obj = {
+                                writerId: proj.writerId,
+                                userObj: user_obj,
+                                title: proj.title,
+                                text: proj.text,
+                                startDt: proj.startDt,
+                                endDt: proj.endDt,
+                                positionNeed: proj.positionNeed,
+                                attachments: proj.attachments
+                            }
+                            res.status(200).json(json_obj)
+                        }
+                    })
+                }
+            })
         })
-
     }
-    checkQueryString().
-        then(ProjectInfo).
-        catch((err)=>{
-            if (err) throw err
+    checkQueryString().then(ProjectInfo).catch((err) => {
+        if (err)
             res.status(500).send(err)
     })
 }
+
+

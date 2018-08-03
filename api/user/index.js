@@ -10,6 +10,6 @@ router.post('/login', login.socialLogin) // 소셜로그인 (회원가입)
 router.post('/profileWrite', multerS3.single('images'), profile.write) // 프로필 작성
 router.get('/myProfile', profile.getMyProfile) // 나의 프로필 조회
 router.get('/myProfile/tooltip', profile.getMyProfileTooltip) // 나의 프로필 Tooltip 조회
-router.get('/myProfile/simple', profile.LookupSimpleProflie) // 나의 프로질 요약 정보 조회
+router.post('/myProfile/simple', profile.LookupSimpleProflie) // 나의 프로질 요약 정보 조회
 
 module.exports = router

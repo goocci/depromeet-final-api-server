@@ -271,13 +271,13 @@ exports.LookupSimpleProflie = (req, res) => {
                     })
                 }
                 else {
-                    res.status(200).send({
-                        nickName: obj.nickName,
-                        realName: obj.realName,
-                        resizedProfileImage: obj.resized.s3Location ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
-                        area: obj.area,
-                        projectNum: obj.projectNum,
-                        position: obj.position,
+                    let json_var = {
+                        nickName: obj.nickName || '',
+                        realName: obj.realName || '',
+                        resizedProfileImage: obj.resized != undefined ? userInfo.profileImage.resized.s3Location : 'https://www.weact.org/wp-content/uploads/2016/10/Blank-profile.png',
+                        area: obj.area || '',
+                        projectNum: obj.projectNum || '',
+                        position: obj.position || '',
                         backendSkill: obj.skillCode.backend.map((x) => {
                             return {
                                 code: x.code,
@@ -296,8 +296,9 @@ exports.LookupSimpleProflie = (req, res) => {
                                 score: x.score
                             }
                         }),
-                        email: obj.email
-                    })
+                        email: obj.email || ''
+                    }
+                    res.status(200).send(json_var)
                 }
             })
         })
@@ -306,6 +307,6 @@ exports.LookupSimpleProflie = (req, res) => {
     SendUserSimpleProfile(userId)
         .catch((err) => {
             if (err)
-                req.status(500).send(err)
+                res.status(500).send(err)
         })
 }

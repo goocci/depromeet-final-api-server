@@ -1056,7 +1056,7 @@ paths:
       description: Project ID로 상세 내용 조회
       parameters:
         - in: body
-          name: pId
+          name: id
           description: Project ID
           type: string
           required: true
