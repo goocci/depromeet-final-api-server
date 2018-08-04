@@ -87,9 +87,9 @@ exports.write = (req, res) => {
     const imageUpload = (user) => {
         return new Promise((resolve, reject) => {
             if (req.file){
-                let fileName = path.basename(req.file.location).slice(path.basename.indexOf('_') + 1)
+                let fileName = path.basename(req.file.location).slice(path.basename(req.file.location).indexOf('_') + 1)
                 let dirname = path.dirname(req.file.location)
-                let resizedDirname = path.dirname.replace('images/original', 'copy/images')
+                let resizedDirname = path.dirname(req.file.location).replace('images/original', 'copy/images')
                 user.profileImage.original.fileName = fileName || ''
                 user.profileImage.original.s3Location = req.file.location || ''
                 user.profileImage.original.size = req.file.size || ''
@@ -108,15 +108,15 @@ exports.write = (req, res) => {
     //4. 응답
     const response = (user) => {
         const returnValue = {
-            userId: user.userId,
-            position: user.position,
-            email: user.email,
-            area: user.area,
-            backendSkill: user.skillCode.backend,
-            frontendSkill: user.skillCode.frontend,
-            designSkill: user.skillCode.design,
-            profileImage: user.profileImage,
-            projectNum: user.projectNum
+            userId: user.userId || '',
+            position: user.position || '',
+            email: user.email || '',
+            area: user.area || '',
+            backendSkill: user.skillCode.backend || [],
+            frontendSkill: user.skillCode.frontend || [],
+            designSkill: user.skillCode.design || [],
+            profileImage: user.profileImage || [],
+            projectNum: user.projectNum || ''
         }
         res.status(200).json(returnValue)
     }
@@ -128,6 +128,7 @@ exports.write = (req, res) => {
         .catch((err)=>{
           console.log(err)
             if(err){
+                console.log(err)
                 res.status(500).json(err)
             }
         })
