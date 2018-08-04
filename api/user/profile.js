@@ -126,6 +126,7 @@ exports.write = (req, res) => {
         .then(imageUpload)
         .then(response)
         .catch((err)=>{
+          console.log(ee)
             if(err){
                 res.status(500).json(err)
             }

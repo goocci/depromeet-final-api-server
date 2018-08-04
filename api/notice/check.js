@@ -1,6 +1,5 @@
 'use strict'
 
-const User = require('../../models/user')
 const Notice = require('../../models/notice')
 
 /**
